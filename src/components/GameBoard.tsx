@@ -123,6 +123,8 @@ const GameBoard = () => {
   const lockedRef = useRef<boolean[]>([false, false, false, false, false, false]);
   const [finalResults, setFinalResults] = useState<number[]>([]);
   const finalResultsRef = useRef<number[]>([]);
+  const shuffleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rollStartRef = useRef<number>(0);
   const lockTimesRef = useRef<number[]>([]);
   const lockOrderRef = useRef<number[]>([]);
 
