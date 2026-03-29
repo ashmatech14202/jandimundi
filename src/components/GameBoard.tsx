@@ -65,6 +65,29 @@ const GameBoard = () => {
   const [results, setResults] = useState<number[]>([]);
   const [isRolling, setIsRolling] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [shuffleSymbols, setShuffleSymbols] = useState<number[]>([]);
+  const shuffleRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Shuffle symbols rapidly during rolling
+  useEffect(() => {
+    if (isRolling && results.length === 0) {
+      // Start fast shuffling
+      shuffleRef.current = setInterval(() => {
+        setShuffleSymbols(
+          Array.from({ length: 6 }, () => Math.floor(Math.random() * 6))
+        );
+      }, 100);
+    } else {
+      if (shuffleRef.current) {
+        clearInterval(shuffleRef.current);
+        shuffleRef.current = null;
+      }
+      setShuffleSymbols([]);
+    }
+    return () => {
+      if (shuffleRef.current) clearInterval(shuffleRef.current);
+    };
+  }, [isRolling, results]);
 
   const rollDice = useCallback(() => {
     if (isRolling) return;
