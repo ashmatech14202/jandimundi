@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // JHANDI MUNDA — EXACT TRADITIONAL GUTI REPRODUCTIONS
 // ═══════════════════════════════════════════════════════════════
+import crownImage from "@/assets/crown-guti.jpg";
 // Flat vector, no shadows, no gradients
 // Colors: Black #1A1A1A, Red #B7352A, White #FFFFFF
 // Bold outlines, exact traditional shapes
