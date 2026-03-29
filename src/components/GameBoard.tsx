@@ -110,27 +110,59 @@ const GameBoard = () => {
   const [showInfo, setShowInfo] = useState(false);
   const [shufflingSymbols, setShufflingSymbols] = useState<number[]>([0, 1, 2, 3, 4, 5]);
   const [shuffleRotations, setShuffleRotations] = useState<number[]>([0, 0, 0, 0, 0, 0]);
-  const shuffleRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const [rollElapsed, setRollElapsed] = useState(0);
+  const [lockedDice, setLockedDice] = useState<boolean[]>([false, false, false, false, false, false]);
+  const lockedRef = useRef<boolean[]>([false, false, false, false, false, false]);
+  const [finalResults, setFinalResults] = useState<number[]>([]);
+  const finalResultsRef = useRef<number[]>([]);
+  const shuffleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rollStartRef = useRef<number>(0);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Rapidly shuffle symbols during rolling phase
   useEffect(() => {
     if (isRolling) {
       rollStartRef.current = Date.now();
-      // Speed starts fast, slows down toward end
+      
+      // Generate final results upfront
+      const newFinalResults = Array.from({ length: 6 }, () =>
+        Math.floor(Math.random() * 6)
+      );
+      setFinalResults(newFinalResults);
+      finalResultsRef.current = newFinalResults;
+      const initLocked = [false, false, false, false, false, false];
+      setLockedDice(initLocked);
+      lockedRef.current = initLocked;
+
+      // Staggered lock-in: each die locks at a random time in the last 3 seconds
+      const lockTimes = [5000, 5400, 5800, 6200, 6600, 7200];
+      const lockOrder = [0, 1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
+      
+      lockOrder.forEach((dieIndex, i) => {
+        setTimeout(() => {
+          lockedRef.current = [...lockedRef.current];
+          lockedRef.current[dieIndex] = true;
+          setLockedDice([...lockedRef.current]);
+          setShufflingSymbols(prev => {
+            const next = [...prev];
+            next[dieIndex] = newFinalResults[dieIndex];
+            return next;
+          });
+          setShuffleRotations(prev => {
+            const next = [...prev];
+            next[dieIndex] = 0;
+            return next;
+          });
+        }, lockTimes[i]);
+      });
+
       const updateShuffle = () => {
         const elapsed = (Date.now() - rollStartRef.current) / 1000;
-        setRollElapsed(elapsed);
-        // Slow down: interval increases from 80ms to 400ms over 8 seconds
-        const speed = Math.min(400, 80 + (elapsed / 8) * 320);
+        const speed = Math.min(180, 60 + (elapsed / 8) * 120);
         
-        setShufflingSymbols(
-          Array.from({ length: 6 }, () => Math.floor(Math.random() * 6))
+        setShufflingSymbols(prev => 
+          prev.map((val, i) => lockedRef.current[i] ? finalResultsRef.current[i] : Math.floor(Math.random() * 6))
         );
-        setShuffleRotations(
-          Array.from({ length: 6 }, () => (Math.random() - 0.5) * 40)
+        setShuffleRotations(prev =>
+          prev.map((val, i) => lockedRef.current[i] ? 0 : (Math.random() - 0.5) * 30)
         );
         
         if (elapsed < 8) {
@@ -143,13 +175,13 @@ const GameBoard = () => {
         clearTimeout(shuffleRef.current);
         shuffleRef.current = null;
       }
-      setRollElapsed(0);
     }
     return () => {
       if (shuffleRef.current) clearTimeout(shuffleRef.current);
     };
   }, [isRolling]);
 
+  // Update shuffle to respect locked dice
   const rollDice = useCallback(() => {
     if (isRolling) return;
     setResults([]);
@@ -157,11 +189,10 @@ const GameBoard = () => {
     playRollSound();
 
     setTimeout(() => {
-      const newResults = Array.from({ length: 6 }, () =>
-        Math.floor(Math.random() * 6)
-      );
-      setResults(newResults);
+      setResults(finalResultsRef.current);
       setIsRolling(false);
+      setLockedDice([false, false, false, false, false, false]);
+      lockedRef.current = [false, false, false, false, false, false];
     }, 8000);
   }, [isRolling]);
 
@@ -231,16 +262,25 @@ const GameBoard = () => {
           {isRolling
             ? shufflingSymbols.map((symbolIndex, i) => {
                 const SymbolComp = SYMBOLS[symbolIndex].Component;
+                const isLocked = lockedDice[i];
                 return (
                   <motion.div
                     key={`rolling-${i}`}
                     className="flex items-center justify-center"
-                    animate={{ 
+                    animate={isLocked ? { 
+                      rotate: 0,
+                      scale: [1.15, 1],
+                    } : { 
                       rotate: shuffleRotations[i],
-                      scale: [1, 0.9, 1],
+                      scale: [1, 0.92, 1],
                     }}
-                    transition={{
-                      duration: 0.15,
+                    transition={isLocked ? {
+                      duration: 0.3,
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 15,
+                    } : {
+                      duration: 0.1,
                       ease: "easeInOut",
                     }}
                   >
