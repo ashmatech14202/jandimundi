@@ -262,16 +262,25 @@ const GameBoard = () => {
           {isRolling
             ? shufflingSymbols.map((symbolIndex, i) => {
                 const SymbolComp = SYMBOLS[symbolIndex].Component;
+                const isLocked = lockedDice[i];
                 return (
                   <motion.div
                     key={`rolling-${i}`}
                     className="flex items-center justify-center"
-                    animate={{ 
+                    animate={isLocked ? { 
+                      rotate: 0,
+                      scale: [1.15, 1],
+                    } : { 
                       rotate: shuffleRotations[i],
-                      scale: [1, 0.9, 1],
+                      scale: [1, 0.92, 1],
                     }}
-                    transition={{
-                      duration: 0.15,
+                    transition={isLocked ? {
+                      duration: 0.3,
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 15,
+                    } : {
+                      duration: 0.1,
                       ease: "easeInOut",
                     }}
                   >
