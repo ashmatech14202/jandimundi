@@ -10,6 +10,7 @@ const AdminLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +32,14 @@ const AdminLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      if (isSignup) {
+        const { error } = await supabase.auth.signUp({ email, password });
+        if (error) throw error;
+        toast.success("Account created! Ask the existing admin to grant you admin access, then login.");
+        setIsSignup(false);
+        return;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
