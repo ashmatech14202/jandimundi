@@ -15,7 +15,7 @@ const CowrieShell = ({ faceUp, index, isRolling }: CowrieShellProps) => {
         isRolling
           ? {
               opacity: 1,
-              y: [−200, 20, −10, 0],
+              y: [-200, 20, -10, 0],
               x: [(index - 2.5) * 10, (index - 2.5) * 30],
               rotate: [0, 360 * (index % 2 === 0 ? 1 : -1), 720 * (index % 2 === 0 ? 1 : -1)],
             }
