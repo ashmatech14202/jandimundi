@@ -132,63 +132,65 @@ export const FlagSymbol = ({ size = 80 }: { size?: number }) => (
 // Black crown with red heart inside, arc of dots, cross on top, decorative base
 export const CrownSymbol = ({ size = 80 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Cross on top */}
-    <rect x="94" y="0" width="12" height="28" fill={BK} />
-    <rect x="78" y="8" width="44" height="12" fill={BK} />
-    {/* Cross end dots */}
-    <circle cx="78" cy="14" r="6" fill={BK} />
-    <circle cx="122" cy="14" r="6" fill={BK} />
-    <circle cx="100" cy="2" r="6" fill={BK} />
+    {/* Cross on top - arrow/triangle tip */}
+    <polygon points="100,0 94,12 106,12" fill={BK} />
+    <rect x="96" y="10" width="8" height="20" fill={BK} />
+    <rect x="80" y="14" width="40" height="8" fill={BK} />
+    {/* Cross arm end triangles */}
+    <polygon points="80,18 74,12 74,24" fill={BK} />
+    <polygon points="120,18 126,12 126,24" fill={BK} />
 
     {/* Stem between cross and crown */}
-    <rect x="96" y="26" width="8" height="16" fill={BK} />
+    <rect x="97" y="28" width="6" height="14" fill={BK} />
 
-    {/* Circle connector */}
+    {/* Circle connector (ring) */}
     <circle cx="100" cy="47" r="8" fill={BK} />
-    <circle cx="100" cy="47" r="4" fill={WH} />
+    <circle cx="100" cy="47" r="4.5" fill={WH} />
 
-    {/* Arc of dots around crown (semicircle) */}
-    {Array.from({ length: 15 }, (_, i) => {
-      const angle = Math.PI + (Math.PI * i) / 14;
-      const cx = 100 + Math.cos(angle) * 75;
-      const cy = 118 + Math.sin(angle) * 62;
-      return <circle key={i} cx={cx} cy={cy} r="7.5" fill={BK} />;
+    {/* Arc of dots around crown (semicircle) - larger, bolder */}
+    {Array.from({ length: 13 }, (_, i) => {
+      const angle = Math.PI + (Math.PI * i) / 12;
+      const cx = 100 + Math.cos(angle) * 72;
+      const cy = 115 + Math.sin(angle) * 60;
+      return <circle key={i} cx={cx} cy={cy} r="8" fill={BK} />;
     })}
 
-    {/* Crown body */}
+    {/* Crown body - smooth rounded humps */}
     <path
-      d="M38 140 L48 72 L75 105 L100 68 L125 105 L152 72 L162 140 Z"
+      d="M38 145 C38 145, 42 80, 55 75 C65 72, 72 95, 78 100 C84 105, 90 75, 100 70 C110 75, 116 105, 122 100 C128 95, 135 72, 145 75 C158 80, 162 145, 162 145 Z"
       fill={BK}
       stroke={BK}
-      strokeWidth="3"
+      strokeWidth="2"
       strokeLinejoin="round"
     />
 
-    {/* Red heart inside crown */}
+    {/* Red heart/inner shape */}
     <path
-      d="M72 112 C72 95, 100 86, 100 102 C100 86, 128 95, 128 112 C128 132, 100 148, 100 148 C100 148, 72 132, 72 112Z"
+      d="M68 118 C68 98, 100 86, 100 105 C100 86, 132 98, 132 118 C132 138, 100 155, 100 155 C100 155, 68 138, 68 118Z"
       fill={RD}
     />
 
-    {/* Heart inner curved stripes (left side) */}
-    <path d="M80 110 C80 100, 100 94, 100 103" fill="none" stroke={BK} strokeWidth="3" />
-    <path d="M84 118 C84 106, 100 99, 100 108" fill="none" stroke={BK} strokeWidth="3" />
-    <path d="M88 124 C88 114, 100 108, 100 114" fill="none" stroke={BK} strokeWidth="3" />
+    {/* Heart inner curved red stripes - left side */}
+    <path d="M76 115 C76 102, 100 93, 100 106" fill="none" stroke={BK} strokeWidth="3.5" />
+    <path d="M80 122 C80 108, 100 98, 100 112" fill="none" stroke={BK} strokeWidth="3.5" />
+    <path d="M84 128 C84 116, 100 106, 100 118" fill="none" stroke={BK} strokeWidth="3" />
+    <path d="M90 134 C90 124, 100 116, 100 124" fill="none" stroke={BK} strokeWidth="2.5" />
     {/* Right side mirrored */}
-    <path d="M120 110 C120 100, 100 94, 100 103" fill="none" stroke={BK} strokeWidth="3" />
-    <path d="M116 118 C116 106, 100 99, 100 108" fill="none" stroke={BK} strokeWidth="3" />
-    <path d="M112 124 C112 114, 100 108, 100 114" fill="none" stroke={BK} strokeWidth="3" />
+    <path d="M124 115 C124 102, 100 93, 100 106" fill="none" stroke={BK} strokeWidth="3.5" />
+    <path d="M120 122 C120 108, 100 98, 100 112" fill="none" stroke={BK} strokeWidth="3.5" />
+    <path d="M116 128 C116 116, 100 106, 100 118" fill="none" stroke={BK} strokeWidth="3" />
+    <path d="M110 134 C110 124, 100 116, 100 124" fill="none" stroke={BK} strokeWidth="2.5" />
 
     {/* Crown base bar */}
-    <rect x="35" y="148" width="130" height="20" rx="3" fill={BK} />
+    <rect x="35" y="150" width="130" height="20" rx="3" fill={BK} />
 
     {/* Base decorative ovals */}
-    {[52, 68, 84, 100, 116, 132, 148].map((x, i) => (
-      <ellipse key={i} cx={x} cy="158" rx="4.5" ry="6" fill={WH} />
+    {[50, 64, 78, 92, 106, 120, 134, 148].map((x, i) => (
+      <ellipse key={i} cx={x} cy="160" rx="4" ry="6" fill={WH} />
     ))}
 
     {/* Horizontal line above base */}
-    <rect x="35" y="143" width="130" height="5" fill={BK} />
+    <rect x="35" y="145" width="130" height="5" fill={BK} />
   </svg>
 );
 
