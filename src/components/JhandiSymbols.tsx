@@ -31,18 +31,18 @@ export const CrownSymbol = ({ size = 80 }: { size?: number }) => (
     <circle cx="80" cy="15" r="5" fill="#1a1a1a" />
     <circle cx="120" cy="15" r="5" fill="#1a1a1a" />
     <circle cx="100" cy="2" r="5" fill="#1a1a1a" />
-    {/* Crown top - dark green/black */}
-    <path d="M40 120 L55 50 L100 85 L145 50 L160 120 Z" fill="#1a3a2a" stroke="#1a1a1a" strokeWidth="3" />
+    {/* Crown top */}
+    <path d="M40 120 L55 50 L100 85 L145 50 L160 120 Z" fill="#1a1a1a" stroke="#1a1a1a" strokeWidth="3" />
     {/* Dots around crown */}
     {[40, 55, 70, 85, 100, 115, 130, 145, 160].map((x, i) => (
-      <circle key={i} cx={x} cy={125} r="6" fill="#1a3a2a" />
+      <circle key={i} cx={x} cy={125} r="6" fill="#1a1a1a" />
     ))}
     {/* Crown base */}
-    <rect x="35" y="130" width="130" height="25" rx="3" fill="#1a3a2a" stroke="#1a1a1a" strokeWidth="2" />
+    <rect x="35" y="130" width="130" height="25" rx="3" fill="#1a1a1a" stroke="#1a1a1a" strokeWidth="2" />
     {/* Decorative lines on base */}
-    <line x1="45" y1="137" x2="155" y2="137" stroke="#2a5a3a" strokeWidth="2" />
-    <line x1="45" y1="142" x2="155" y2="142" stroke="#2a5a3a" strokeWidth="2" />
-    <line x1="45" y1="147" x2="155" y2="147" stroke="#2a5a3a" strokeWidth="2" />
+    <line x1="45" y1="137" x2="155" y2="137" stroke="#333" strokeWidth="2" />
+    <line x1="45" y1="142" x2="155" y2="142" stroke="#333" strokeWidth="2" />
+    <line x1="45" y1="147" x2="155" y2="147" stroke="#333" strokeWidth="2" />
     {/* Heart in center of crown */}
     <path d="M82 85 C82 72, 100 65, 100 80 C100 65, 118 72, 118 85 C118 100, 100 112, 100 112 C100 112, 82 100, 82 85Z" fill="#c0392b" />
     {/* Inner heart lines */}
