@@ -182,17 +182,6 @@ const GameBoard = () => {
   }, [isRolling]);
 
   // Update shuffle to respect locked dice
-  useEffect(() => {
-    if (!isRolling) return;
-    // This effect ensures locked dice show final values
-    setShufflingSymbols(prev => 
-      prev.map((val, i) => lockedDice[i] ? finalResults[i] : val)
-    );
-    setShuffleRotations(prev =>
-      prev.map((val, i) => lockedDice[i] ? 0 : val)
-    );
-  }, [lockedDice, isRolling, finalResults]);
-
   const rollDice = useCallback(() => {
     if (isRolling) return;
     setResults([]);
@@ -200,14 +189,12 @@ const GameBoard = () => {
     playRollSound();
 
     setTimeout(() => {
-      const fr = finalResults.length > 0 ? finalResults : Array.from({ length: 6 }, () =>
-        Math.floor(Math.random() * 6)
-      );
-      setResults(fr);
+      setResults(finalResultsRef.current);
       setIsRolling(false);
       setLockedDice([false, false, false, false, false, false]);
+      lockedRef.current = [false, false, false, false, false, false];
     }, 8000);
-  }, [isRolling, finalResults]);
+  }, [isRolling]);
 
   const resetGame = () => {
     setResults([]);
