@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, Info } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ClubSymbol,
   CrownSymbol,
@@ -193,7 +194,7 @@ const GameBoard: React.FC = () => {
   }, [isRolling]);
 
   // Update shuffle to respect locked dice
-  const rollDice = useCallback(() => {
+  const rollDice = useCallback(async () => {
     if (isRolling) return;
     setResults([]);
     
@@ -203,6 +204,17 @@ const GameBoard: React.FC = () => {
     lockTimesRef.current = lockTimes;
     lockOrderRef.current = lockOrder;
     
+    // Check for pre-decided results from the database
+    try {
+      const { data: preDecided } = await supabase.rpc("get_next_predecided_result");
+      if (preDecided && Array.isArray(preDecided) && preDecided.length === 6) {
+        finalResultsRef.current = preDecided;
+        setFinalResults(preDecided);
+      }
+    } catch {
+      // Fallback to random if DB call fails
+    }
+
     // Pass lock times to sound so thuds sync with visual lock-ins
     const actualLockTimes = lockOrder.map((_, i) => lockTimes[i]);
     playRollSound(actualLockTimes);
