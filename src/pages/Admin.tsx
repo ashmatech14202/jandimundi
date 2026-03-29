@@ -89,9 +89,7 @@ const Admin = () => {
       toast.error("Failed to save result");
       return;
     }
-    toast.success("Settings saved successfully! ✅", {
-      duration: 3000,
-    });
+    toast("Okay", { duration: 2000 });
     fetchActiveResult();
   };
 
