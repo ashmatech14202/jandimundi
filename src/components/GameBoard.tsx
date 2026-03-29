@@ -235,11 +235,13 @@ const GameBoard = () => {
                   <motion.div
                     key={`rolling-${i}`}
                     className="flex items-center justify-center"
-                    animate={{ rotate: 360 }}
+                    animate={{ 
+                      rotate: shuffleRotations[i],
+                      scale: [1, 0.9, 1],
+                    }}
                     transition={{
-                      repeat: Infinity,
-                      duration: 0.4 + i * 0.08,
-                      ease: "linear",
+                      duration: 0.15,
+                      ease: "easeInOut",
                     }}
                   >
                     <SymbolComp size={130} />
