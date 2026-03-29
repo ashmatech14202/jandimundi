@@ -1,6 +1,6 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, Info, Download } from "lucide-react";
+import { Volume2, Info } from "lucide-react";
 import {
   ClubSymbol,
   CrownSymbol,
