@@ -1,150 +1,188 @@
-// SVG symbols for Jhandi Munda / Langur Burja game
-// Matches traditional dice faces exactly
+// Precise SVG symbols matching traditional Jhandi Munda / Langur Burja dice
+// Colors: Black #1a1a1a, Dark Red #9B2D2D
 
+const RED = "#9B2D2D";
+const BLACK = "#1a1a1a";
+
+// 1. CROWN (Mukut) - Black crown with red heart inside, dots around, cross on top
+export const CrownSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Cross on top */}
+    <rect x="94" y="0" width="12" height="30" fill={BLACK} />
+    <rect x="78" y="8" width="44" height="12" fill={BLACK} />
+    {/* Cross end circles */}
+    <circle cx="78" cy="14" r="6" fill={BLACK} />
+    <circle cx="122" cy="14" r="6" fill={BLACK} />
+    <circle cx="100" cy="2" r="6" fill={BLACK} />
+    {/* Stem below cross */}
+    <rect x="96" y="28" width="8" height="15" fill={BLACK} />
+    {/* Circle below cross */}
+    <circle cx="100" cy="48" r="8" fill={BLACK} />
+    <circle cx="100" cy="48" r="4" fill="white" />
+    {/* Arc of dots around crown */}
+    {Array.from({ length: 13 }, (_, i) => {
+      const angle = Math.PI + (Math.PI * i) / 12;
+      const cx = 100 + Math.cos(angle) * 72;
+      const cy = 115 + Math.sin(angle) * 65;
+      return <circle key={i} cx={cx} cy={cy} r="8" fill={BLACK} />;
+    })}
+    {/* Crown body outline */}
+    <path d="M45 130 L55 75 L78 105 L100 70 L122 105 L145 75 L155 130 Z" fill={BLACK} stroke={BLACK} strokeWidth="3" />
+    {/* Red heart inside crown */}
+    <path d="M75 110 C75 92, 100 85, 100 100 C100 85, 125 92, 125 110 C125 128, 100 140, 100 140 C100 140, 75 128, 75 110Z" fill={RED} />
+    {/* Heart inner lines (curved stripes) */}
+    <path d="M82 108 C82 97, 100 92, 100 100" fill="none" stroke={BLACK} strokeWidth="2.5" />
+    <path d="M85 115 C85 102, 100 96, 100 104" fill="none" stroke={BLACK} strokeWidth="2.5" />
+    <path d="M88 120 C88 108, 100 102, 100 108" fill="none" stroke={BLACK} strokeWidth="2.5" />
+    <path d="M118 108 C118 97, 100 92, 100 100" fill="none" stroke={BLACK} strokeWidth="2.5" />
+    <path d="M115 115 C115 102, 100 96, 100 104" fill="none" stroke={BLACK} strokeWidth="2.5" />
+    <path d="M112 120 C112 108, 100 102, 100 108" fill="none" stroke={BLACK} strokeWidth="2.5" />
+    {/* Crown base */}
+    <rect x="40" y="148" width="120" height="18" rx="3" fill={BLACK} stroke={BLACK} strokeWidth="2" />
+    {/* Base decorative ovals */}
+    {[55, 72, 89, 106, 123, 140].map((x, i) => (
+      <ellipse key={i} cx={x} cy="157" rx="5" ry="5" fill="white" />
+    ))}
+    {/* Base lines */}
+    <line x1="42" y1="145" x2="158" y2="145" stroke={BLACK} strokeWidth="3" />
+  </svg>
+);
+
+// 2. DIAMOND / BURJA - Red 4-pointed concave star with geometric sun pattern
+export const DiamondSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Outer 4-pointed concave star */}
+    <path d="M100 5 C115 45, 155 45, 195 100 C155 155, 115 155, 100 195 C85 155, 45 155, 5 100 C45 45, 85 45, 100 5Z" fill={RED} />
+    {/* Inner white cutouts - radiating pattern */}
+    {/* Center circle */}
+    <circle cx="100" cy="100" r="16" fill="white" />
+    <circle cx="100" cy="100" r="8" fill={RED} />
+    {/* 8 radiating trapezoid cutouts */}
+    {/* Top */}
+    <path d="M93 25 L107 25 L108 78 L92 78Z" fill="white" />
+    {/* Bottom */}
+    <path d="M93 175 L107 175 L108 122 L92 122Z" fill="white" />
+    {/* Left */}
+    <path d="M25 93 L25 107 L78 108 L78 92Z" fill="white" />
+    {/* Right */}
+    <path d="M175 93 L175 107 L122 108 L122 92Z" fill="white" />
+    {/* Top-right diagonal */}
+    <path d="M140 30 L155 42 L115 110 L108 95Z" fill="white" />
+    {/* Top-left diagonal */}
+    <path d="M60 30 L45 42 L85 110 L92 95Z" fill="white" />
+    {/* Bottom-right diagonal */}
+    <path d="M140 170 L155 158 L115 90 L108 105Z" fill="white" />
+    {/* Bottom-left diagonal */}
+    <path d="M60 170 L45 158 L85 90 L92 105Z" fill="white" />
+    {/* Small diamond cutouts between rays */}
+    <polygon points="130,55 140,65 130,75 120,65" fill="white" />
+    <polygon points="70,55 80,65 70,75 60,65" fill="white" />
+    <polygon points="130,125 140,135 130,145 120,135" fill="white" />
+    <polygon points="70,125 80,135 70,145 60,135" fill="white" />
+  </svg>
+);
+
+// 3. HEART (Pan) - Red inverted teardrop with white stripes and two concentric circle eyes
+export const HeartSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Main teardrop/heart shape pointing UP at top, round bottom */}
+    <path d="M100 10 L160 90 C170 110, 170 140, 150 160 C140 172, 120 180, 100 185 C80 180, 60 172, 50 160 C30 140, 30 110, 40 90 Z" fill={RED} stroke={RED} strokeWidth="2" />
+    {/* White horizontal stripes at top triangle */}
+    <line x1="72" y1="50" x2="128" y2="50" stroke="white" strokeWidth="3.5" />
+    <line x1="62" y1="60" x2="138" y2="60" stroke="white" strokeWidth="3.5" />
+    <line x1="55" y1="70" x2="145" y2="70" stroke="white" strokeWidth="3.5" />
+    <line x1="48" y1="80" x2="152" y2="80" stroke="white" strokeWidth="3.5" />
+    {/* Center vertical line in striped area */}
+    <line x1="100" y1="15" x2="100" y2="90" stroke="white" strokeWidth="2" />
+    {/* Left concentric circle eye */}
+    <circle cx="72" cy="130" r="28" fill={RED} stroke="white" strokeWidth="4" />
+    <circle cx="72" cy="130" r="18" fill={RED} stroke="white" strokeWidth="2.5" />
+    <circle cx="72" cy="130" r="6" fill="white" />
+    {/* Right concentric circle eye */}
+    <circle cx="128" cy="130" r="28" fill={RED} stroke="white" strokeWidth="4" />
+    <circle cx="128" cy="130" r="18" fill={RED} stroke="white" strokeWidth="2.5" />
+    <circle cx="128" cy="130" r="6" fill="white" />
+  </svg>
+);
+
+// 4. SPADE - Same as heart but RED outline style (bottom-left in ref is same as top-right)
+// Actually looking at reference, spade/heart are the same symbol. 
+// The 6 symbols are: Crown, Diamond, Heart, Heart(duplicate shown), Flag, Crown(duplicate)
+// Real 6: Crown, Diamond, Spade(black), Heart(red), Flag, Club
+// But reference shows only red hearts and black crowns - let me use the actual 6 traditional ones
+
+// Spade (Hukum) - Same shape as heart but BLACK
+export const SpadeSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Main teardrop shape */}
+    <path d="M100 10 L160 90 C170 110, 170 140, 150 160 C140 172, 120 180, 100 185 C80 180, 60 172, 50 160 C30 140, 30 110, 40 90 Z" fill={BLACK} stroke={BLACK} strokeWidth="2" />
+    {/* White horizontal stripes at top */}
+    <line x1="72" y1="50" x2="128" y2="50" stroke="white" strokeWidth="3.5" />
+    <line x1="62" y1="60" x2="138" y2="60" stroke="white" strokeWidth="3.5" />
+    <line x1="55" y1="70" x2="145" y2="70" stroke="white" strokeWidth="3.5" />
+    <line x1="48" y1="80" x2="152" y2="80" stroke="white" strokeWidth="3.5" />
+    {/* Center vertical line */}
+    <line x1="100" y1="15" x2="100" y2="90" stroke="white" strokeWidth="2" />
+    {/* Left eye */}
+    <circle cx="72" cy="130" r="28" fill={BLACK} stroke="white" strokeWidth="4" />
+    <circle cx="72" cy="130" r="18" fill={BLACK} stroke="white" strokeWidth="2.5" />
+    <circle cx="72" cy="130" r="6" fill="white" />
+    {/* Right eye */}
+    <circle cx="128" cy="130" r="28" fill={BLACK} stroke="white" strokeWidth="4" />
+    <circle cx="128" cy="130" r="18" fill={BLACK} stroke="white" strokeWidth="2.5" />
+    <circle cx="128" cy="130" r="6" fill="white" />
+  </svg>
+);
+
+// 5. FLAG (Jhandi) - Black outlined flag with red checkered grid, on a pole with arrow bottom
+export const FlagSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Pole */}
+    <line x1="145" y1="20" x2="145" y2="175" stroke={BLACK} strokeWidth="6" strokeLinecap="round" />
+    {/* Pole top curve */}
+    <path d="M145 20 C145 15, 140 12, 135 15" stroke={BLACK} strokeWidth="5" fill="none" strokeLinecap="round" />
+    {/* Flag body - waving shape */}
+    <path d="M135 18 C110 15, 80 30, 50 25 C35 50, 40 80, 50 105 C80 100, 110 115, 140 110 Z" fill="white" stroke={BLACK} strokeWidth="6" />
+    {/* Red fill inside flag */}
+    <path d="M128 26 C108 24, 82 35, 56 32 C44 52, 47 76, 56 98 C82 94, 108 106, 132 104 Z" fill={RED} />
+    {/* Grid lines - horizontal */}
+    <line x1="55" y1="45" x2="132" y2="42" stroke="white" strokeWidth="2" />
+    <line x1="50" y1="58" x2="135" y2="55" stroke="white" strokeWidth="2" />
+    <line x1="48" y1="70" x2="137" y2="68" stroke="white" strokeWidth="2" />
+    <line x1="50" y1="82" x2="135" y2="82" stroke="white" strokeWidth="2" />
+    <line x1="53" y1="94" x2="133" y2="95" stroke="white" strokeWidth="2" />
+    {/* Grid lines - vertical */}
+    <line x1="70" y1="28" x2="68" y2="100" stroke="white" strokeWidth="2" />
+    <line x1="85" y1="26" x2="84" y2="102" stroke="white" strokeWidth="2" />
+    <line x1="100" y1="25" x2="100" y2="105" stroke="white" strokeWidth="2" />
+    <line x1="115" y1="27" x2="116" y2="106" stroke="white" strokeWidth="2" />
+    {/* Arrow at bottom of pole */}
+    <line x1="145" y1="175" x2="125" y2="200" stroke={BLACK} strokeWidth="5" strokeLinecap="round" />
+    <line x1="145" y1="175" x2="165" y2="200" stroke={BLACK} strokeWidth="5" strokeLinecap="round" />
+    <line x1="145" y1="185" x2="145" y2="210" stroke={BLACK} strokeWidth="5" strokeLinecap="round" />
+  </svg>
+);
+
+// 6. CLUB (Chiria) - Black clover/trefoil with concentric circle eyes
 export const ClubSymbol = ({ size = 80 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
     {/* Top circle */}
-    <circle cx="100" cy="55" r="45" fill="#1a1a1a" />
-    <circle cx="100" cy="55" r="28" fill="white" />
-    <circle cx="100" cy="55" r="15" fill="#1a1a1a" />
+    <circle cx="100" cy="50" r="42" fill={BLACK} />
+    <circle cx="100" cy="50" r="26" fill="white" />
+    <circle cx="100" cy="50" r="14" fill={BLACK} />
     {/* Left circle */}
-    <circle cx="55" cy="125" r="45" fill="#1a1a1a" />
-    <circle cx="55" cy="125" r="28" fill="white" />
-    <circle cx="55" cy="125" r="15" fill="#1a1a1a" />
+    <circle cx="58" cy="120" r="42" fill={BLACK} />
+    <circle cx="58" cy="120" r="26" fill="white" />
+    <circle cx="58" cy="120" r="14" fill={BLACK} />
     {/* Right circle */}
-    <circle cx="145" cy="125" r="45" fill="#1a1a1a" />
-    <circle cx="145" cy="125" r="28" fill="white" />
-    <circle cx="145" cy="125" r="15" fill="#1a1a1a" />
-    {/* Center fill */}
-    <circle cx="100" cy="95" r="20" fill="#1a1a1a" />
-    {/* Stem triangle */}
-    <polygon points="85,155 115,155 100,210" fill="#1a1a1a" />
-  </svg>
-);
-
-export const CrownSymbol = ({ size = 80 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Cross on top */}
-    <rect x="95" y="0" width="10" height="35" fill="#1a1a1a" />
-    <rect x="80" y="10" width="40" height="10" fill="#1a1a1a" />
-    {/* Small circles on cross ends */}
-    <circle cx="80" cy="15" r="5" fill="#1a1a1a" />
-    <circle cx="120" cy="15" r="5" fill="#1a1a1a" />
-    <circle cx="100" cy="2" r="5" fill="#1a1a1a" />
-    {/* Crown top */}
-    <path d="M40 120 L55 50 L100 85 L145 50 L160 120 Z" fill="#1a1a1a" stroke="#1a1a1a" strokeWidth="3" />
-    {/* Dots around crown */}
-    {[40, 55, 70, 85, 100, 115, 130, 145, 160].map((x, i) => (
-      <circle key={i} cx={x} cy={125} r="6" fill="#1a1a1a" />
-    ))}
-    {/* Crown base */}
-    <rect x="35" y="130" width="130" height="25" rx="3" fill="#1a1a1a" stroke="#1a1a1a" strokeWidth="2" />
-    {/* Decorative lines on base */}
-    <line x1="45" y1="137" x2="155" y2="137" stroke="#333" strokeWidth="2" />
-    <line x1="45" y1="142" x2="155" y2="142" stroke="#333" strokeWidth="2" />
-    <line x1="45" y1="147" x2="155" y2="147" stroke="#333" strokeWidth="2" />
-    {/* Heart in center of crown */}
-    <path d="M82 85 C82 72, 100 65, 100 80 C100 65, 118 72, 118 85 C118 100, 100 112, 100 112 C100 112, 82 100, 82 85Z" fill="#c0392b" />
-    {/* Inner heart lines */}
-    <path d="M88 85 C88 78, 100 73, 100 82 C100 73, 112 78, 112 85 C112 95, 100 103, 100 103 C100 103, 88 95, 88 85Z" fill="none" stroke="#e74c3c" strokeWidth="2" />
-  </svg>
-);
-
-export const SpadeSymbol = ({ size = 80 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Main spade shape */}
-    <path d="M100 5 C100 5, 20 80, 20 130 C20 165, 50 175, 75 160 C75 160, 70 175, 65 180 L100 180 L135 180 C130 175, 125 160, 125 160 C150 175, 180 165, 180 130 C180 80, 100 5, 100 5Z" fill="#1a1a1a" />
-    {/* Horizontal stripes on top */}
-    <line x1="70" y1="45" x2="130" y2="45" stroke="white" strokeWidth="3" />
-    <line x1="55" y1="55" x2="145" y2="55" stroke="white" strokeWidth="3" />
-    <line x1="45" y1="65" x2="155" y2="65" stroke="white" strokeWidth="3" />
-    <line x1="38" y1="75" x2="162" y2="75" stroke="white" strokeWidth="3" />
-    <line x1="32" y1="85" x2="168" y2="85" stroke="white" strokeWidth="3" />
-    {/* Center line */}
-    <line x1="100" y1="10" x2="100" y2="95" stroke="white" strokeWidth="2" />
-    {/* Two white circle eyes */}
-    <circle cx="70" cy="120" r="18" fill="white" />
-    <circle cx="130" cy="120" r="18" fill="white" />
-    {/* Inner dark pupils */}
-    <circle cx="70" cy="120" r="8" fill="#1a1a1a" />
-    <circle cx="130" cy="120" r="8" fill="#1a1a1a" />
-  </svg>
-);
-
-export const DiamondSymbol = ({ size = 80 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Outer 4-pointed star */}
-    <path d="M100 5 L130 40 L195 100 L130 160 L100 195 L70 160 L5 100 L70 40 Z" fill="none" stroke="#c0392b" strokeWidth="6" />
-    {/* Inner diamond lines - creating the geometric pattern */}
-    {/* Diagonal lines from center */}
-    <line x1="100" y1="30" x2="100" y2="170" stroke="#c0392b" strokeWidth="4" />
-    <line x1="30" y1="100" x2="170" y2="100" stroke="#c0392b" strokeWidth="4" />
-    <line x1="60" y1="50" x2="140" y2="150" stroke="#c0392b" strokeWidth="3" />
-    <line x1="140" y1="50" x2="60" y2="150" stroke="#c0392b" strokeWidth="3" />
-    {/* Radiating lines from center */}
-    <line x1="100" y1="100" x2="70" y2="40" stroke="#c0392b" strokeWidth="3" />
-    <line x1="100" y1="100" x2="130" y2="40" stroke="#c0392b" strokeWidth="3" />
-    <line x1="100" y1="100" x2="70" y2="160" stroke="#c0392b" strokeWidth="3" />
-    <line x1="100" y1="100" x2="130" y2="160" stroke="#c0392b" strokeWidth="3" />
-    <line x1="100" y1="100" x2="40" y2="70" stroke="#c0392b" strokeWidth="3" />
-    <line x1="100" y1="100" x2="40" y2="130" stroke="#c0392b" strokeWidth="3" />
-    <line x1="100" y1="100" x2="160" y2="70" stroke="#c0392b" strokeWidth="3" />
-    <line x1="100" y1="100" x2="160" y2="130" stroke="#c0392b" strokeWidth="3" />
-    {/* Center circle */}
-    <circle cx="100" cy="100" r="15" fill="none" stroke="#c0392b" strokeWidth="4" />
-    <circle cx="100" cy="100" r="5" fill="#c0392b" />
-    {/* Small inner shapes */}
-    <circle cx="100" cy="65" r="5" fill="none" stroke="#c0392b" strokeWidth="2" />
-    <circle cx="100" cy="135" r="5" fill="none" stroke="#c0392b" strokeWidth="2" />
-    <circle cx="65" cy="100" r="5" fill="none" stroke="#c0392b" strokeWidth="2" />
-    <circle cx="135" cy="100" r="5" fill="none" stroke="#c0392b" strokeWidth="2" />
-  </svg>
-);
-
-export const FlagSymbol = ({ size = 80 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Flag pole */}
-    <line x1="70" y1="15" x2="70" y2="170" stroke="#1a1a1a" strokeWidth="5" />
-    {/* Pole top */}
-    <circle cx="70" cy="12" r="6" fill="#1a1a1a" />
-    {/* Flag body - curved */}
-    <path d="M73 20 Q130 25, 160 35 Q170 70, 155 100 Q130 110, 73 105 Z" fill="#c0392b" stroke="#1a1a1a" strokeWidth="4" />
-    {/* Grid lines on flag - horizontal */}
-    <line x1="75" y1="38" x2="158" y2="45" stroke="#1a1a1a" strokeWidth="2" />
-    <line x1="75" y1="55" x2="163" y2="58" stroke="#1a1a1a" strokeWidth="2" />
-    <line x1="75" y1="72" x2="162" y2="72" stroke="#1a1a1a" strokeWidth="2" />
-    <line x1="75" y1="88" x2="158" y2="88" stroke="#1a1a1a" strokeWidth="2" />
-    {/* Grid lines on flag - vertical */}
-    <line x1="95" y1="22" x2="93" y2="104" stroke="#1a1a1a" strokeWidth="2" />
-    <line x1="115" y1="25" x2="113" y2="103" stroke="#1a1a1a" strokeWidth="2" />
-    <line x1="135" y1="30" x2="133" y2="100" stroke="#1a1a1a" strokeWidth="2" />
-    <line x1="152" y1="35" x2="150" y2="96" stroke="#1a1a1a" strokeWidth="2" />
-    {/* Crossed sticks at bottom */}
-    <line x1="55" y1="210" x2="85" y2="155" stroke="#1a1a1a" strokeWidth="4" />
-    <line x1="85" y1="210" x2="55" y2="155" stroke="#1a1a1a" strokeWidth="4" />
-    {/* Arrow tips */}
-    <polygon points="50,215 55,210 60,215 55,205" fill="#1a1a1a" />
-    <polygon points="80,215 85,210 90,215 85,205" fill="#1a1a1a" />
-  </svg>
-);
-
-export const HeartSymbol = ({ size = 80 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Main heart/spade shape pointing down */}
-    <path d="M100 10 C100 10, 30 50, 30 100 C30 140, 55 165, 75 170 L100 210 L125 170 C145 165, 170 140, 170 100 C170 50, 100 10, 100 10Z" fill="#c0392b" />
-    {/* Horizontal stripes on top */}
-    <line x1="65" y1="45" x2="135" y2="45" stroke="white" strokeWidth="3" />
-    <line x1="52" y1="55" x2="148" y2="55" stroke="white" strokeWidth="3" />
-    <line x1="43" y1="65" x2="157" y2="65" stroke="white" strokeWidth="3" />
-    <line x1="38" y1="75" x2="162" y2="75" stroke="white" strokeWidth="3" />
-    {/* Center vertical line */}
-    <line x1="100" y1="15" x2="100" y2="85" stroke="white" strokeWidth="2" />
-    {/* Two circle eyes */}
-    <circle cx="70" cy="115" r="22" fill="#8b1a1a" />
-    <circle cx="130" cy="115" r="22" fill="#8b1a1a" />
-    <circle cx="70" cy="115" r="14" fill="#c0392b" />
-    <circle cx="130" cy="115" r="14" fill="#c0392b" />
-    <circle cx="70" cy="115" r="7" fill="#8b1a1a" />
-    <circle cx="130" cy="115" r="7" fill="#8b1a1a" />
+    <circle cx="142" cy="120" r="42" fill={BLACK} />
+    <circle cx="142" cy="120" r="26" fill="white" />
+    <circle cx="142" cy="120" r="14" fill={BLACK} />
+    {/* Center fill connecting the three circles */}
+    <circle cx="100" cy="90" r="22" fill={BLACK} />
+    <circle cx="78" cy="82" r="12" fill={BLACK} />
+    <circle cx="122" cy="82" r="12" fill={BLACK} />
+    {/* Stem/triangle at bottom */}
+    <polygon points="85,150 115,150 100,210" fill={BLACK} />
   </svg>
 );
