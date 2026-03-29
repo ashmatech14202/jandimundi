@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, Info } from "lucide-react";
 import {
@@ -19,6 +19,48 @@ const SYMBOLS = [
   { name: "Club", Component: ClubSymbol },
 ];
 
+// Generate a dice roll sound using Web Audio API
+const playRollSound = () => {
+  try {
+    const ctx = new AudioContext();
+    const duration = 0.6;
+    const numShakes = 12;
+
+    for (let i = 0; i < numShakes; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.type = "square";
+      osc.frequency.value = 80 + Math.random() * 120;
+
+      const startTime = ctx.currentTime + (i * duration) / numShakes;
+      const shakeDur = duration / numShakes * 0.7;
+
+      gain.gain.setValueAtTime(0.08, startTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + shakeDur);
+
+      osc.start(startTime);
+      osc.stop(startTime + shakeDur);
+    }
+
+    // Final landing thud
+    const thud = ctx.createOscillator();
+    const thudGain = ctx.createGain();
+    thud.connect(thudGain);
+    thudGain.connect(ctx.destination);
+    thud.type = "sine";
+    thud.frequency.value = 60;
+    thudGain.gain.setValueAtTime(0.15, ctx.currentTime + duration);
+    thudGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration + 0.15);
+    thud.start(ctx.currentTime + duration);
+    thud.stop(ctx.currentTime + duration + 0.15);
+  } catch (e) {
+    // Audio not available
+  }
+};
+
 const GameBoard = () => {
   const [results, setResults] = useState<number[]>([]);
   const [isRolling, setIsRolling] = useState(false);
@@ -28,6 +70,7 @@ const GameBoard = () => {
     if (isRolling) return;
     setResults([]);
     setIsRolling(true);
+    playRollSound();
 
     setTimeout(() => {
       const newResults = Array.from({ length: 6 }, () =>
@@ -64,11 +107,11 @@ const GameBoard = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="w-full bg-primary py-3 px-4 flex items-center justify-between shadow-md">
-        <h1 className="text-xl font-bold text-primary-foreground tracking-wide">
+      <div className="w-full bg-primary py-4 px-4 flex items-center justify-center relative">
+        <h1 className="text-2xl font-bold text-primary-foreground tracking-wide">
           Jhandi Munda
         </h1>
-        <div className="flex items-center gap-3">
+        <div className="absolute right-4 flex items-center gap-3">
           <button className="text-primary-foreground opacity-80 hover:opacity-100 transition-opacity">
             <Volume2 size={22} />
           </button>
@@ -88,7 +131,7 @@ const GameBoard = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="mx-4 mt-2 p-4 bg-card rounded-xl border border-border text-sm text-foreground shadow-lg"
+            className="mx-4 mt-2 p-4 bg-card rounded-xl border border-border text-sm text-foreground"
           >
             <p className="font-bold mb-1">How to play:</p>
             <p className="text-muted-foreground">
@@ -100,9 +143,9 @@ const GameBoard = () => {
       </AnimatePresence>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 gap-5">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-6 gap-6">
         {/* 6 Symbol grid */}
-        <div className="grid grid-cols-3 gap-5 w-full max-w-xs">
+        <div className="grid grid-cols-3 gap-4 w-full max-w-sm">
           {results.length > 0
             ? results.map((symbolIndex, i) => {
                 const SymbolComp = SYMBOLS[symbolIndex].Component;
@@ -119,7 +162,7 @@ const GameBoard = () => {
                       stiffness: 200,
                     }}
                   >
-                    <SymbolComp size={95} />
+                    <SymbolComp size={100} />
                   </motion.div>
                 );
               })
@@ -133,7 +176,7 @@ const GameBoard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
-                    <SymbolComp size={95} />
+                    <SymbolComp size={100} />
                   </motion.div>
                 );
               })}
@@ -153,7 +196,7 @@ const GameBoard = () => {
                 return (
                   <div
                     key={idx}
-                    className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3 py-1.5 shadow-sm"
+                    className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3 py-1.5"
                   >
                     <SymbolComp size={22} />
                     <span className="text-foreground font-bold text-xs">
@@ -167,11 +210,11 @@ const GameBoard = () => {
         </AnimatePresence>
 
         {/* Buttons */}
-        <div className="flex gap-3 w-full max-w-xs mt-1">
+        <div className="flex gap-4 w-full max-w-sm mt-2">
           <motion.button
             onClick={rollDice}
             disabled={isRolling}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full bg-secondary text-secondary-foreground font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full bg-primary text-primary-foreground font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
@@ -180,7 +223,7 @@ const GameBoard = () => {
           <motion.button
             onClick={resetGame}
             disabled={isRolling || results.length === 0}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full bg-muted text-foreground font-bold text-base disabled:opacity-40 disabled:cursor-not-allowed shadow-md border border-border"
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-full bg-primary text-primary-foreground font-bold text-base disabled:opacity-40 disabled:cursor-not-allowed"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
