@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, Info } from "lucide-react";
 import {
@@ -65,6 +65,27 @@ const GameBoard = () => {
   const [results, setResults] = useState<number[]>([]);
   const [isRolling, setIsRolling] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [shufflingSymbols, setShufflingSymbols] = useState<number[]>([0, 1, 2, 3, 4, 5]);
+  const shuffleRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Rapidly shuffle symbols during rolling phase
+  useEffect(() => {
+    if (isRolling) {
+      shuffleRef.current = setInterval(() => {
+        setShufflingSymbols(
+          Array.from({ length: 6 }, () => Math.floor(Math.random() * 6))
+        );
+      }, 120);
+    } else {
+      if (shuffleRef.current) {
+        clearInterval(shuffleRef.current);
+        shuffleRef.current = null;
+      }
+    }
+    return () => {
+      if (shuffleRef.current) clearInterval(shuffleRef.current);
+    };
+  }, [isRolling]);
 
   const rollDice = useCallback(() => {
     if (isRolling) return;
@@ -77,10 +98,8 @@ const GameBoard = () => {
         Math.floor(Math.random() * 6)
       );
       setResults(newResults);
-      setTimeout(() => {
-        setIsRolling(false);
-      }, 500);
-    }, 600);
+      setIsRolling(false);
+    }, 12000);
   }, [isRolling]);
 
   const resetGame = () => {
@@ -146,40 +165,58 @@ const GameBoard = () => {
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-6 gap-6">
         {/* 6 Symbol grid */}
         <div className="grid grid-cols-3 gap-4 w-full max-w-sm">
-          {results.length > 0
-            ? results.map((symbolIndex, i) => {
+          {isRolling
+            ? shufflingSymbols.map((symbolIndex, i) => {
                 const SymbolComp = SYMBOLS[symbolIndex].Component;
                 return (
                   <motion.div
-                    key={`result-${i}`}
+                    key={`rolling-${i}`}
                     className="flex items-center justify-center"
-                    initial={{ opacity: 0, scale: 0.2, rotate: -180 }}
-                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    animate={{ rotate: 360 }}
                     transition={{
-                      delay: i * 0.08,
-                      duration: 0.5,
-                      type: "spring",
-                      stiffness: 200,
+                      repeat: Infinity,
+                      duration: 0.4 + i * 0.08,
+                      ease: "linear",
                     }}
                   >
                     <SymbolComp size={130} />
                   </motion.div>
                 );
               })
-            : SYMBOLS.map((symbol, i) => {
-                const SymbolComp = symbol.Component;
-                return (
-                  <motion.div
-                    key={`default-${i}`}
-                    className="flex items-center justify-center"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                  >
-                    <SymbolComp size={130} />
-                  </motion.div>
-                );
-              })}
+            : results.length > 0
+              ? results.map((symbolIndex, i) => {
+                  const SymbolComp = SYMBOLS[symbolIndex].Component;
+                  return (
+                    <motion.div
+                      key={`result-${i}`}
+                      className="flex items-center justify-center"
+                      initial={{ opacity: 0, scale: 0.2, rotate: -180 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      transition={{
+                        delay: i * 0.08,
+                        duration: 0.5,
+                        type: "spring",
+                        stiffness: 200,
+                      }}
+                    >
+                      <SymbolComp size={130} />
+                    </motion.div>
+                  );
+                })
+              : SYMBOLS.map((symbol, i) => {
+                  const SymbolComp = symbol.Component;
+                  return (
+                    <motion.div
+                      key={`default-${i}`}
+                      className="flex items-center justify-center"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <SymbolComp size={130} />
+                    </motion.div>
+                  );
+                })}
         </div>
 
         {/* Result badges */}
