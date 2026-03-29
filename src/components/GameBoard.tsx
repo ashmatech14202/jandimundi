@@ -123,8 +123,8 @@ const GameBoard = () => {
   const lockedRef = useRef<boolean[]>([false, false, false, false, false, false]);
   const [finalResults, setFinalResults] = useState<number[]>([]);
   const finalResultsRef = useRef<number[]>([]);
-  const shuffleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const rollStartRef = useRef<number>(0);
+  const lockTimesRef = useRef<number[]>([]);
+  const lockOrderRef = useRef<number[]>([]);
 
   // Rapidly shuffle symbols during rolling phase
   useEffect(() => {
@@ -194,8 +194,18 @@ const GameBoard = () => {
   const rollDice = useCallback(() => {
     if (isRolling) return;
     setResults([]);
+    
+    // Pre-compute lock times and order
+    const lockTimes = [5000, 5400, 5800, 6200, 6600, 7200];
+    const lockOrder = [0, 1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
+    lockTimesRef.current = lockTimes;
+    lockOrderRef.current = lockOrder;
+    
+    // Pass lock times to sound so thuds sync with visual lock-ins
+    const actualLockTimes = lockOrder.map((_, i) => lockTimes[i]);
+    playRollSound(actualLockTimes);
+    
     setIsRolling(true);
-    playRollSound();
 
     setTimeout(() => {
       setResults(finalResultsRef.current);
