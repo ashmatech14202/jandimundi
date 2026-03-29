@@ -10,12 +10,12 @@ import {
 } from "./JhandiSymbols";
 
 const SYMBOLS = [
-  { name: "Club", Component: ClubSymbol },
   { name: "Crown", Component: CrownSymbol },
-  { name: "Spade", Component: SpadeSymbol },
   { name: "Diamond", Component: DiamondSymbol },
-  { name: "Flag", Component: FlagSymbol },
   { name: "Heart", Component: HeartSymbol },
+  { name: "Spade", Component: SpadeSymbol },
+  { name: "Flag", Component: FlagSymbol },
+  { name: "Club", Component: ClubSymbol },
 ];
 
 const GameBoard = () => {
