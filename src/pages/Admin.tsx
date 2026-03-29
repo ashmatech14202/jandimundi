@@ -89,14 +89,9 @@ const Admin = () => {
       toast.error("Failed to save result");
       return;
     }
-    const savedNames = currentResult.map(idx => SYMBOLS[idx].name).join(", ");
-    toast.success(`Result saved: ${savedNames}`, {
-      description: "Every roll will now show this result.",
-      duration: 4000,
-      icon: "✅",
+    toast.success("Settings saved successfully! ✅", {
+      duration: 3000,
     });
-    setShowSavedConfirmation(true);
-    setTimeout(() => setShowSavedConfirmation(false), 5000);
     fetchActiveResult();
   };
 
