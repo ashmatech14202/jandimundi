@@ -111,7 +111,9 @@ const GameBoard = () => {
   const [shufflingSymbols, setShufflingSymbols] = useState<number[]>([0, 1, 2, 3, 4, 5]);
   const [shuffleRotations, setShuffleRotations] = useState<number[]>([0, 0, 0, 0, 0, 0]);
   const [lockedDice, setLockedDice] = useState<boolean[]>([false, false, false, false, false, false]);
+  const lockedRef = useRef<boolean[]>([false, false, false, false, false, false]);
   const [finalResults, setFinalResults] = useState<number[]>([]);
+  const finalResultsRef = useRef<number[]>([]);
   const shuffleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rollStartRef = useRef<number>(0);
 
