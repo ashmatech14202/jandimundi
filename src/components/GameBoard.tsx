@@ -109,24 +109,44 @@ const GameBoard = () => {
   const [isRolling, setIsRolling] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [shufflingSymbols, setShufflingSymbols] = useState<number[]>([0, 1, 2, 3, 4, 5]);
+  const [shuffleRotations, setShuffleRotations] = useState<number[]>([0, 0, 0, 0, 0, 0]);
   const shuffleRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [rollElapsed, setRollElapsed] = useState(0);
+  const rollStartRef = useRef<number>(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Rapidly shuffle symbols during rolling phase
   useEffect(() => {
     if (isRolling) {
-      shuffleRef.current = setInterval(() => {
+      rollStartRef.current = Date.now();
+      // Speed starts fast, slows down toward end
+      const updateShuffle = () => {
+        const elapsed = (Date.now() - rollStartRef.current) / 1000;
+        setRollElapsed(elapsed);
+        // Slow down: interval increases from 80ms to 400ms over 8 seconds
+        const speed = Math.min(400, 80 + (elapsed / 8) * 320);
+        
         setShufflingSymbols(
           Array.from({ length: 6 }, () => Math.floor(Math.random() * 6))
         );
-      }, 120);
+        setShuffleRotations(
+          Array.from({ length: 6 }, () => (Math.random() - 0.5) * 40)
+        );
+        
+        if (elapsed < 8) {
+          shuffleRef.current = setTimeout(updateShuffle, speed);
+        }
+      };
+      updateShuffle();
     } else {
       if (shuffleRef.current) {
-        clearInterval(shuffleRef.current);
+        clearTimeout(shuffleRef.current);
         shuffleRef.current = null;
       }
+      setRollElapsed(0);
     }
     return () => {
-      if (shuffleRef.current) clearInterval(shuffleRef.current);
+      if (shuffleRef.current) clearTimeout(shuffleRef.current);
     };
   }, [isRolling]);
 
@@ -215,11 +235,13 @@ const GameBoard = () => {
                   <motion.div
                     key={`rolling-${i}`}
                     className="flex items-center justify-center"
-                    animate={{ rotate: 360 }}
+                    animate={{ 
+                      rotate: shuffleRotations[i],
+                      scale: [1, 0.9, 1],
+                    }}
                     transition={{
-                      repeat: Infinity,
-                      duration: 0.4 + i * 0.08,
-                      ease: "linear",
+                      duration: 0.15,
+                      ease: "easeInOut",
                     }}
                   >
                     <SymbolComp size={130} />
