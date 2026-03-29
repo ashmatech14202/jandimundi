@@ -90,8 +90,15 @@ const AdminLogin = () => {
             required
           />
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Please wait..." : isSignup ? "Sign Up" : "Login"}
           </Button>
+          <button
+            type="button"
+            onClick={() => setIsSignup(!isSignup)}
+            className="text-sm text-primary hover:underline w-full text-center"
+          >
+            {isSignup ? "Already have an account? Login" : "Need an account? Sign Up"}
+          </button>
         </form>
       </div>
     </div>
