@@ -113,7 +113,7 @@ const playRollSound = (lockTimesMs: number[]) => {
   }
 };
 
-const GameBoard = () => {
+const GameBoard: React.FC = () => {
   const [results, setResults] = useState<number[]>([]);
   const [isRolling, setIsRolling] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
