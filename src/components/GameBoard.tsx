@@ -80,7 +80,7 @@ const GameBoard = () => {
       setTimeout(() => {
         setIsRolling(false);
       }, 500);
-    }, 5000);
+    }, 12000);
   }, [isRolling]);
 
   const resetGame = () => {
