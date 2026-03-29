@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { LogOut, Save, Trash2, Shuffle, CheckCircle2, AlertCircle } from "lucide-react";
+import { LogOut, Save, Trash2, Shuffle, CheckCircle2, AlertCircle, Zap } from "lucide-react";
 import {
   ClubSymbol,
   CrownSymbol,
@@ -22,6 +22,15 @@ const SYMBOLS = [
   { name: "Club", Component: ClubSymbol },
 ];
 
+// Common presets: patterns that admin might want quickly
+const PRESETS = [
+  { label: "3 Crown + 3 Heart", result: [0, 0, 0, 2, 2, 2] },
+  { label: "3 Diamond + 3 Spade", result: [1, 1, 1, 3, 3, 3] },
+  { label: "3 Flag + 3 Club", result: [4, 4, 4, 5, 5, 5] },
+  { label: "All Different", result: [0, 1, 2, 3, 4, 5] },
+  { label: "Random Mix", result: "random" as const },
+];
+
 const Admin = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -29,7 +38,6 @@ const Admin = () => {
   const [hasActiveResult, setHasActiveResult] = useState(false);
   const [activeResultId, setActiveResultId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [showSavedConfirmation, setShowSavedConfirmation] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -93,6 +101,39 @@ const Admin = () => {
     fetchActiveResult();
   };
 
+  // Quick save: set all to one symbol AND save in one tap
+  const handleQuickSave = async (symbolIndex: number) => {
+    const result = [symbolIndex, symbolIndex, symbolIndex, symbolIndex, symbolIndex, symbolIndex];
+    setCurrentResult(result);
+
+    setSaving(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { setSaving(false); return; }
+
+    await supabase.from("pre_decided_results").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    const { error } = await supabase.from("pre_decided_results").insert({
+      results: result,
+      created_by: session.user.id,
+    });
+
+    setSaving(false);
+    if (error) {
+      toast.error("Failed to save");
+      return;
+    }
+    toast("Okay", { duration: 2000 });
+    fetchActiveResult();
+  };
+
+  const handlePreset = (preset: typeof PRESETS[number]) => {
+    if (preset.result === "random") {
+      const randomResult = Array.from({ length: 6 }, () => Math.floor(Math.random() * 6));
+      setCurrentResult(randomResult);
+    } else {
+      setCurrentResult([...preset.result]);
+    }
+  };
+
   const handleClear = async () => {
     await supabase.from("pre_decided_results").delete().neq("id", "00000000-0000-0000-0000-000000000000");
     toast.success("Cleared! Rolls will be random now.");
@@ -141,134 +182,122 @@ const Admin = () => {
         </Button>
       </div>
 
-      <div className="max-w-md mx-auto p-4 space-y-5">
+      <div className="max-w-md mx-auto p-4 space-y-4">
         {/* Status Banner */}
-        <div className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+        <div className={`flex items-center gap-3 p-3 rounded-xl border transition-colors ${
           hasActiveResult
             ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
             : "bg-muted border-border"
         }`}>
           {hasActiveResult ? (
-            <CheckCircle2 className="text-green-600 dark:text-green-400 shrink-0" size={22} />
+            <CheckCircle2 className="text-green-600 dark:text-green-400 shrink-0" size={20} />
           ) : (
-            <AlertCircle className="text-muted-foreground shrink-0" size={22} />
+            <AlertCircle className="text-muted-foreground shrink-0" size={20} />
           )}
-          <div>
+          <div className="flex-1">
             <p className={`text-sm font-semibold ${hasActiveResult ? "text-green-800 dark:text-green-300" : "text-foreground"}`}>
-              {hasActiveResult ? "Pre-decided result is ACTIVE" : "No result set"}
+              {hasActiveResult ? "Result is ACTIVE ✅" : "No result set"}
             </p>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {hasActiveResult ? "Every roll will show the result below" : "All rolls are currently random"}
+            <p className="text-xs text-muted-foreground">
+              {hasActiveResult ? "Every roll shows this result" : "All rolls are random"}
             </p>
+          </div>
+          {hasActiveResult && (
+            <Button variant="outline" size="sm" onClick={handleClear} className="text-destructive border-destructive/30 hover:bg-destructive/10 h-8 text-xs">
+              <Trash2 size={14} className="mr-1" /> Clear
+            </Button>
+          )}
+        </div>
+
+        {/* ⚡ One-Tap: Set & Save All Same */}
+        <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Zap size={16} className="text-primary" />
+            <h2 className="font-semibold text-foreground text-sm">One-Tap Set & Save</h2>
+          </div>
+          <p className="text-xs text-muted-foreground">Tap a symbol to instantly set all 6 dice and save:</p>
+          <div className="grid grid-cols-6 gap-2">
+            {SYMBOLS.map((sym, idx) => (
+              <button
+                key={sym.name}
+                onClick={() => handleQuickSave(idx)}
+                disabled={saving}
+                className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border hover:border-primary hover:bg-primary/5 active:scale-95 transition-all disabled:opacity-50"
+                title={`Set all to ${sym.name} & save`}
+              >
+                <sym.Component size={36} />
+                <span className="text-[9px] text-muted-foreground font-medium">{sym.name}</span>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Quick Set All */}
+        {/* Presets */}
         <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-          <h2 className="font-semibold text-foreground text-sm">Quick Set (All 6 Dice)</h2>
-          <div className="flex gap-2 justify-between">
-            {SYMBOLS.map((sym, idx) => {
-              const isSelected = currentResult.every(v => v === idx);
-              return (
-                <button
-                  key={sym.name}
-                  onClick={() => handleSetAll(idx)}
-                  className={`flex flex-col items-center gap-1 p-2 rounded-lg border transition-all ${
-                    isSelected
-                      ? "border-primary bg-primary/10 shadow-sm"
-                      : "border-transparent hover:bg-muted"
-                  }`}
-                  title={`Set all to ${sym.name}`}
-                >
-                  <sym.Component size={32} />
-                  <span className="text-[9px] text-muted-foreground font-medium">{sym.name}</span>
-                </button>
-              );
-            })}
+          <h2 className="font-semibold text-foreground text-sm">Quick Presets</h2>
+          <div className="flex flex-wrap gap-2">
+            {PRESETS.map((preset) => (
+              <button
+                key={preset.label}
+                onClick={() => handlePreset(preset)}
+                className="px-3 py-1.5 text-xs font-medium rounded-full border border-border bg-muted/50 hover:bg-primary/10 hover:border-primary/30 active:scale-95 transition-all"
+              >
+                {preset.result === "random" && <Shuffle size={12} className="inline mr-1 -mt-0.5" />}
+                {preset.label}
+              </button>
+            ))}
           </div>
         </div>
 
         {/* Individual Die Selection */}
         <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-          <h2 className="font-semibold text-foreground text-sm">Set Each Die Individually</h2>
+          <h2 className="font-semibold text-foreground text-sm">Set Each Die</h2>
           <div className="grid grid-cols-6 gap-2">
             {currentResult.map((symbolIdx, dieIndex) => (
-              <div key={dieIndex} className="flex flex-col items-center gap-1">
+              <div key={dieIndex} className="flex flex-col items-center gap-0.5">
                 <span className="text-[10px] text-muted-foreground font-bold">#{dieIndex + 1}</span>
                 <button
                   onClick={() => handleSymbolChange(dieIndex, (symbolIdx - 1 + 6) % 6)}
-                  className="text-muted-foreground hover:text-foreground text-base leading-none p-1 rounded hover:bg-muted transition-colors"
+                  className="text-muted-foreground hover:text-foreground text-sm leading-none p-1 rounded hover:bg-muted transition-colors"
                 >
                   ▲
                 </button>
-                <div className="w-11 h-11 flex items-center justify-center bg-muted/50 rounded-lg border border-border">
+                <div className="w-10 h-10 flex items-center justify-center bg-muted/50 rounded-lg border border-border">
                   {(() => {
                     const SymComp = SYMBOLS[symbolIdx].Component;
-                    return <SymComp size={34} />;
+                    return <SymComp size={30} />;
                   })()}
                 </div>
                 <button
                   onClick={() => handleSymbolChange(dieIndex, (symbolIdx + 1) % 6)}
-                  className="text-muted-foreground hover:text-foreground text-base leading-none p-1 rounded hover:bg-muted transition-colors"
+                  className="text-muted-foreground hover:text-foreground text-sm leading-none p-1 rounded hover:bg-muted transition-colors"
                 >
                   ▼
                 </button>
-                <span className="text-[9px] text-muted-foreground">{SYMBOLS[symbolIdx].name}</span>
+                <span className="text-[8px] text-muted-foreground">{SYMBOLS[symbolIdx].name}</span>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex gap-3">
-          <Button onClick={handleSave} className="flex-1 h-11" disabled={saving}>
+        {/* Save & Preview */}
+        <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+          <h2 className="font-semibold text-foreground text-sm">Preview & Save</h2>
+          <div className="flex justify-center gap-2 py-1">
+            {currentResult.map((symbolIdx, i) => {
+              const SymComp = SYMBOLS[symbolIdx].Component;
+              return (
+                <div key={i} className="w-11 h-11 flex items-center justify-center bg-muted rounded-lg border border-border">
+                  <SymComp size={34} />
+                </div>
+              );
+            })}
+          </div>
+          <Button onClick={handleSave} className="w-full h-11" disabled={saving}>
             <Save size={16} className="mr-1.5" />
-            {saving ? "Saving..." : "Save Result"}
+            {saving ? "Saving..." : "Save This Result"}
           </Button>
-          {hasActiveResult && (
-            <Button variant="outline" onClick={handleClear} className="h-11 text-destructive border-destructive/30 hover:bg-destructive/10">
-              <Trash2 size={16} className="mr-1.5" /> Clear
-            </Button>
-          )}
         </div>
-
-        {/* Saved Confirmation Banner */}
-        {showSavedConfirmation && (
-          <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-400 dark:border-green-600 rounded-xl p-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-            <div className="flex items-center gap-2 justify-center">
-              <CheckCircle2 className="text-green-600 dark:text-green-400" size={20} />
-              <h2 className="font-bold text-green-800 dark:text-green-300 text-sm">Settings Saved Successfully!</h2>
-            </div>
-            <p className="text-xs text-center text-green-700 dark:text-green-400">Next roll will show:</p>
-            <div className="flex justify-center gap-2 py-1">
-              {currentResult.map((symbolIdx, i) => {
-                const SymComp = SYMBOLS[symbolIdx].Component;
-                return (
-                  <div key={i} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-green-900/30 rounded-lg border-2 border-green-300 dark:border-green-600 shadow-sm">
-                    <SymComp size={38} />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Preview */}
-        {!showSavedConfirmation && currentResult.some((_, i) => i >= 0) && (
-          <div className="bg-card border border-border rounded-xl p-4 space-y-2">
-            <h2 className="font-semibold text-foreground text-sm">Preview</h2>
-            <div className="flex justify-center gap-2 py-2">
-              {currentResult.map((symbolIdx, i) => {
-                const SymComp = SYMBOLS[symbolIdx].Component;
-                return (
-                  <div key={i} className="w-12 h-12 flex items-center justify-center bg-muted rounded-lg border border-border">
-                    <SymComp size={38} />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
