@@ -23,39 +23,41 @@ const SYMBOLS = [
 const playRollSound = () => {
   try {
     const ctx = new AudioContext();
-    const duration = 0.6;
-    const numShakes = 12;
+    const duration = 0.8;
 
-    for (let i = 0; i < numShakes; i++) {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+    // Rolling noise — rapid clicks like dice tumbling on a surface
+    const bufferLen = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferLen, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
 
-      osc.type = "square";
-      osc.frequency.value = 80 + Math.random() * 120;
-
-      const startTime = ctx.currentTime + (i * duration) / numShakes;
-      const shakeDur = duration / numShakes * 0.7;
-
-      gain.gain.setValueAtTime(0.08, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + shakeDur);
-
-      osc.start(startTime);
-      osc.stop(startTime + shakeDur);
+    for (let i = 0; i < bufferLen; i++) {
+      const t = i / ctx.sampleRate;
+      // Decaying amplitude envelope — loud at start, fades out
+      const envelope = Math.pow(1 - t / duration, 1.5);
+      // Rapid clicking pattern simulating dice bouncing
+      const clickRate = 30 - 20 * (t / duration); // slows down over time
+      const click = Math.sin(2 * Math.PI * clickRate * t) > 0.3 ? 1 : 0;
+      // Mix noise bursts with clicks
+      const noise = (Math.random() * 2 - 1) * 0.5;
+      const tone = Math.sin(2 * Math.PI * 200 * t) * 0.3;
+      data[i] = envelope * click * (noise + tone) * 0.4;
     }
 
-    // Final landing thud
-    const thud = ctx.createOscillator();
-    const thudGain = ctx.createGain();
-    thud.connect(thudGain);
-    thudGain.connect(ctx.destination);
-    thud.type = "sine";
-    thud.frequency.value = 60;
-    thudGain.gain.setValueAtTime(0.15, ctx.currentTime + duration);
-    thudGain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration + 0.15);
-    thud.start(ctx.currentTime + duration);
-    thud.stop(ctx.currentTime + duration + 0.15);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+
+    // Add slight filter for wooden table feel
+    const filter = ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 2000;
+
+    const gain = ctx.createGain();
+    gain.gain.value = 0.5;
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    source.start();
   } catch (e) {
     // Audio not available
   }
