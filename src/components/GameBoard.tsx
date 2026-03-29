@@ -127,20 +127,20 @@ const GameBoard = () => {
         Math.floor(Math.random() * 6)
       );
       setFinalResults(newFinalResults);
-      setLockedDice([false, false, false, false, false, false]);
+      finalResultsRef.current = newFinalResults;
+      const initLocked = [false, false, false, false, false, false];
+      setLockedDice(initLocked);
+      lockedRef.current = initLocked;
 
-      // Staggered lock-in times: each die locks at different time in last 3 seconds
-      const lockTimes = [5000, 5400, 5800, 6200, 6600, 7000];
-      // Shuffle lock order for randomness
+      // Staggered lock-in: each die locks at a random time in the last 3 seconds
+      const lockTimes = [5000, 5400, 5800, 6200, 6600, 7200];
       const lockOrder = [0, 1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
       
       lockOrder.forEach((dieIndex, i) => {
         setTimeout(() => {
-          setLockedDice(prev => {
-            const next = [...prev];
-            next[dieIndex] = true;
-            return next;
-          });
+          lockedRef.current = [...lockedRef.current];
+          lockedRef.current[dieIndex] = true;
+          setLockedDice([...lockedRef.current]);
           setShufflingSymbols(prev => {
             const next = [...prev];
             next[dieIndex] = newFinalResults[dieIndex];
@@ -156,21 +156,14 @@ const GameBoard = () => {
 
       const updateShuffle = () => {
         const elapsed = (Date.now() - rollStartRef.current) / 1000;
-        // Speed: starts fast (80ms), slows to 200ms
-        const speed = Math.min(200, 80 + (elapsed / 8) * 120);
+        const speed = Math.min(180, 60 + (elapsed / 8) * 120);
         
-        setShufflingSymbols(prev => {
-          return prev.map((val, i) => {
-            // Don't change locked dice
-            if (document.querySelector(`[data-locked-${i}="true"]`) !== null) return val;
-            return Math.floor(Math.random() * 6);
-          });
-        });
-        setShuffleRotations(prev => {
-          return prev.map((val, i) => {
-            return (Math.random() - 0.5) * 30;
-          });
-        });
+        setShufflingSymbols(prev => 
+          prev.map((val, i) => lockedRef.current[i] ? finalResultsRef.current[i] : Math.floor(Math.random() * 6))
+        );
+        setShuffleRotations(prev =>
+          prev.map((val, i) => lockedRef.current[i] ? 0 : (Math.random() - 0.5) * 30)
+        );
         
         if (elapsed < 8) {
           shuffleRef.current = setTimeout(updateShuffle, speed);
