@@ -1,6 +1,7 @@
 // ═══════════════════════════════════════════════════════════════
 // JHANDI MUNDA — EXACT TRADITIONAL GUTI REPRODUCTIONS
 // ═══════════════════════════════════════════════════════════════
+import crownImage from "@/assets/crown-guti.jpg";
 // Flat vector, no shadows, no gradients
 // Colors: Black #1A1A1A, Red #B7352A, White #FFFFFF
 // Bold outlines, exact traditional shapes
@@ -131,63 +132,7 @@ export const FlagSymbol = ({ size = 80 }: { size?: number }) => (
 // ── 4. CROWN (Mukut) ──────────────────────────────────────────
 // Black crown with red heart inside, arc of dots, cross on top, decorative base
 export const CrownSymbol = ({ size = 80 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Cross on top - pointed tip */}
-    <polygon points="100,0 95,10 105,10" fill={BK} />
-    <rect x="96" y="8" width="8" height="22" fill={BK} />
-    <rect x="82" y="13" width="36" height="9" fill={BK} />
-    {/* Cross arm pointed ends */}
-    <polygon points="82,17.5 76,11 76,24" fill={BK} />
-    <polygon points="118,17.5 124,11 124,24" fill={BK} />
-
-    {/* Stem */}
-    <rect x="97" y="28" width="6" height="12" fill={BK} />
-
-    {/* Circle ring connector */}
-    <circle cx="100" cy="45" r="7" fill={BK} />
-    <circle cx="100" cy="45" r="3.5" fill={WH} />
-
-    {/* Arc of dots - semicircle, bold */}
-    {Array.from({ length: 13 }, (_, i) => {
-      const angle = Math.PI + (Math.PI * i) / 12;
-      const cx = 100 + Math.cos(angle) * 70;
-      const cy = 112 + Math.sin(angle) * 58;
-      return <circle key={i} cx={cx} cy={cy} r="8.5" fill={BK} />;
-    })}
-
-    {/* Crown body - 3 rounded lobes like reference */}
-    <path
-      d="M40 148 L40 115 Q40 80, 62 80 Q78 80, 78 98 Q78 80, 100 72 Q122 80, 122 98 Q122 80, 138 80 Q160 80, 160 115 L160 148 Z"
-      fill={BK}
-    />
-
-    {/* Red heart inside crown - larger, more prominent */}
-    <path
-      d="M65 116 C65 98, 82 88, 100 104 C118 88, 135 98, 135 116 C135 136, 100 155, 100 155 C100 155, 65 136, 65 116Z"
-      fill={RD}
-    />
-
-    {/* Heart curved stripes - RED stripes visible on red heart (use lighter red / create depth) */}
-    {/* Left curved lines */}
-    <path d="M74 113 C74 100, 88 92, 100 104" fill="none" stroke={BK} strokeWidth="4" strokeLinecap="round" />
-    <path d="M78 120 C78 106, 90 97, 100 110" fill="none" stroke={BK} strokeWidth="3.5" strokeLinecap="round" />
-    <path d="M82 127 C82 115, 92 106, 100 116" fill="none" stroke={BK} strokeWidth="3" strokeLinecap="round" />
-    <path d="M88 134 C88 124, 94 116, 100 122" fill="none" stroke={BK} strokeWidth="2.5" strokeLinecap="round" />
-    {/* Right curved lines (mirrored) */}
-    <path d="M126 113 C126 100, 112 92, 100 104" fill="none" stroke={BK} strokeWidth="4" strokeLinecap="round" />
-    <path d="M122 120 C122 106, 110 97, 100 110" fill="none" stroke={BK} strokeWidth="3.5" strokeLinecap="round" />
-    <path d="M118 127 C118 115, 108 106, 100 116" fill="none" stroke={BK} strokeWidth="3" strokeLinecap="round" />
-    <path d="M112 134 C112 124, 106 116, 100 122" fill="none" stroke={BK} strokeWidth="2.5" strokeLinecap="round" />
-
-    {/* Crown base bar with line above */}
-    <rect x="36" y="148" width="128" height="6" fill={BK} />
-    <rect x="36" y="154" width="128" height="18" rx="2" fill={BK} />
-
-    {/* Base decorative ovals */}
-    {[52, 66, 80, 94, 108, 122, 136, 150].map((x, i) => (
-      <ellipse key={i} cx={x} cy="163" rx="4" ry="5.5" fill={WH} />
-    ))}
-  </svg>
+  <img src={crownImage} alt="Crown" width={size} height={size} style={{ objectFit: "contain" }} />
 );
 
 // ── 5. HEART (Pan) ────────────────────────────────────────────
