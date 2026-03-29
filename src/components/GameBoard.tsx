@@ -19,86 +19,95 @@ const SYMBOLS = [
   { name: "Club", Component: ClubSymbol },
 ];
 
-// Generate a 12-second continuous dice rolling sound using Web Audio API
-const playRollSound = () => {
+// Shared AudioContext for the roll
+let rollAudioCtx: AudioContext | null = null;
+
+// Play continuous dice shaking sound for 8 seconds with individual lock-in thuds
+const playRollSound = (lockTimesMs: number[]) => {
   try {
     const ctx = new AudioContext();
+    rollAudioCtx = ctx;
+    const sampleRate = ctx.sampleRate;
     const duration = 8;
 
-    // Continuous rattling noise — like dice shaking in a cup
-    const sampleRate = ctx.sampleRate;
+    // === Main rolling/shaking sound ===
     const bufLen = Math.floor(sampleRate * duration);
     const buf = ctx.createBuffer(1, bufLen, sampleRate);
     const d = buf.getChannelData(0);
 
-    // Generate rolling texture: rapid clicks that evolve over time
+    // Rapid ticking clicks — like wooden dice tumbling on a hard surface
     let clickTimer = 0;
-    let clickInterval = 0.015; // starts fast
     for (let i = 0; i < bufLen; i++) {
       const t = i / sampleRate;
       clickTimer += 1 / sampleRate;
 
-      // Gradually slow down clicks in the last 2 seconds
-      const slowFactor = t > 6 ? 1 + (t - 6) * 3 : 1;
-      const currentInterval = clickInterval * slowFactor;
+      // Click rate: fast initially, slows in last 3s
+      const baseInterval = 0.012;
+      const slowFactor = t > 5 ? 1 + (t - 5) * 2.5 : 1;
+      const currentInterval = baseInterval * slowFactor;
+
+      // Volume fades as dice lock in (after 5s)
+      const volumeEnv = t > 5 ? Math.max(0, 1 - (t - 5) / 3) : 1;
 
       if (clickTimer >= currentInterval) {
         clickTimer = 0;
-        // Short click burst
-        const burstLen = Math.min(Math.floor(sampleRate * 0.008), bufLen - i);
-        for (let j = 0; j < burstLen && (i + j) < bufLen; j++) {
-          const env = Math.exp(-j / (sampleRate * 0.003));
-          d[i + j] += (Math.random() * 2 - 1) * env * 0.3;
+        // Sharp wooden click
+        const clickLen = Math.min(Math.floor(sampleRate * 0.005), bufLen - i);
+        const pitch = 300 + Math.random() * 600; // varied pitch
+        for (let j = 0; j < clickLen && (i + j) < bufLen; j++) {
+          const env = Math.exp(-j / (sampleRate * 0.002));
+          // Mix of noise + tone for wooden character
+          d[i + j] += ((Math.random() * 2 - 1) * 0.4 + Math.sin(j / sampleRate * pitch * Math.PI * 2) * 0.3) * env * 0.25 * volumeEnv;
         }
       }
 
-      // Add subtle low rumble throughout
-      const rumbleEnv = t > 6 ? Math.max(0, 1 - (t - 6) / 2) : 1;
-      d[i] += Math.sin(t * 120 * Math.PI * 2) * 0.02 * rumbleEnv;
-    }
-
-    // Fade out last 1.5 seconds
-    const fadeStart = Math.floor((duration - 1.5) * sampleRate);
-    for (let i = fadeStart; i < bufLen; i++) {
-      d[i] *= 1 - (i - fadeStart) / (bufLen - fadeStart);
+      // Subtle surface rumble
+      const rumbleEnv = t > 5 ? Math.max(0, 1 - (t - 5) / 3) : 0.8;
+      d[i] += Math.sin(t * 80 * Math.PI * 2) * 0.015 * rumbleEnv;
     }
 
     const src = ctx.createBufferSource();
     src.buffer = buf;
 
-    // Bandpass filter for wooden tone
     const bp = ctx.createBiquadFilter();
     bp.type = "bandpass";
-    bp.frequency.value = 1200;
-    bp.Q.value = 1.5;
+    bp.frequency.value = 1500;
+    bp.Q.value = 1.2;
 
     const gain = ctx.createGain();
-    gain.gain.value = 0.6;
+    gain.gain.value = 0.7;
 
     src.connect(bp);
     bp.connect(gain);
     gain.connect(ctx.destination);
     src.start();
 
-    // Final "thud" landing sound at 12s
-    setTimeout(() => {
-      try {
-        const thudLen = Math.floor(sampleRate * 0.15);
-        const thudBuf = ctx.createBuffer(1, thudLen, sampleRate);
-        const td = thudBuf.getChannelData(0);
-        for (let i = 0; i < thudLen; i++) {
-          const env = Math.exp(-i / (sampleRate * 0.04));
-          td[i] = (Math.random() * 2 - 1) * env * 0.5 + Math.sin(i / sampleRate * 150 * Math.PI * 2) * env * 0.3;
-        }
-        const thudSrc = ctx.createBufferSource();
-        thudSrc.buffer = thudBuf;
-        const thudGain = ctx.createGain();
-        thudGain.gain.value = 0.8;
-        thudSrc.connect(thudGain);
-        thudGain.connect(ctx.destination);
-        thudSrc.start();
-      } catch (e) {}
-    }, duration * 1000);
+    // === Individual lock-in "thud" sounds for each die ===
+    lockTimesMs.forEach((lockTime, idx) => {
+      setTimeout(() => {
+        try {
+          const thudLen = Math.floor(sampleRate * 0.12);
+          const thudBuf = ctx.createBuffer(1, thudLen, sampleRate);
+          const td = thudBuf.getChannelData(0);
+          const basePitch = 100 + Math.random() * 80; // slight pitch variation per die
+          for (let i = 0; i < thudLen; i++) {
+            const env = Math.exp(-i / (sampleRate * 0.03));
+            // Deep thud + surface hit
+            td[i] = (
+              Math.sin(i / sampleRate * basePitch * Math.PI * 2) * 0.4 +
+              (Math.random() * 2 - 1) * 0.3
+            ) * env;
+          }
+          const thudSrc = ctx.createBufferSource();
+          thudSrc.buffer = thudBuf;
+          const thudGain = ctx.createGain();
+          thudGain.gain.value = 0.6;
+          thudSrc.connect(thudGain);
+          thudGain.connect(ctx.destination);
+          thudSrc.start();
+        } catch (e) {}
+      }, lockTime);
+    });
   } catch (e) {
     // Audio not available
   }
