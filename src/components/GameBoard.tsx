@@ -19,43 +19,86 @@ const SYMBOLS = [
   { name: "Club", Component: ClubSymbol },
 ];
 
-// Generate a dice roll sound using Web Audio API
+// Generate a 12-second continuous dice rolling sound using Web Audio API
 const playRollSound = () => {
   try {
     const ctx = new AudioContext();
+    const duration = 12;
 
-    // Multiple rapid "clack" hits that slow down — like dice bouncing
-    const hits = [0, 0.05, 0.1, 0.16, 0.23, 0.31, 0.4, 0.5, 0.62];
-    
-    hits.forEach((time, i) => {
-      const vol = 0.25 * Math.pow(0.75, i); // each hit quieter
-      
-      // Clack sound — short noise burst
-      const bufLen = Math.floor(ctx.sampleRate * 0.03);
-      const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
-      const d = buf.getChannelData(0);
-      for (let j = 0; j < bufLen; j++) {
-        const env = Math.exp(-j / (ctx.sampleRate * 0.008));
-        d[j] = (Math.random() * 2 - 1) * env;
+    // Continuous rattling noise — like dice shaking in a cup
+    const sampleRate = ctx.sampleRate;
+    const bufLen = Math.floor(sampleRate * duration);
+    const buf = ctx.createBuffer(1, bufLen, sampleRate);
+    const d = buf.getChannelData(0);
+
+    // Generate rolling texture: rapid clicks that evolve over time
+    let clickTimer = 0;
+    let clickInterval = 0.015; // starts fast
+    for (let i = 0; i < bufLen; i++) {
+      const t = i / sampleRate;
+      clickTimer += 1 / sampleRate;
+
+      // Gradually slow down clicks in the last 2 seconds
+      const slowFactor = t > 10 ? 1 + (t - 10) * 3 : 1;
+      const currentInterval = clickInterval * slowFactor;
+
+      if (clickTimer >= currentInterval) {
+        clickTimer = 0;
+        // Short click burst
+        const burstLen = Math.min(Math.floor(sampleRate * 0.008), bufLen - i);
+        for (let j = 0; j < burstLen && (i + j) < bufLen; j++) {
+          const env = Math.exp(-j / (sampleRate * 0.003));
+          d[i + j] += (Math.random() * 2 - 1) * env * 0.3;
+        }
       }
 
-      const src = ctx.createBufferSource();
-      src.buffer = buf;
+      // Add subtle low rumble throughout
+      const rumbleEnv = t > 10 ? Math.max(0, 1 - (t - 10) / 2) : 1;
+      d[i] += Math.sin(t * 120 * Math.PI * 2) * 0.02 * rumbleEnv;
+    }
 
-      // Bandpass for wooden "clack" tone
-      const bp = ctx.createBiquadFilter();
-      bp.type = "bandpass";
-      bp.frequency.value = 800 + Math.random() * 600;
-      bp.Q.value = 2;
+    // Fade out last 1.5 seconds
+    const fadeStart = Math.floor((duration - 1.5) * sampleRate);
+    for (let i = fadeStart; i < bufLen; i++) {
+      d[i] *= 1 - (i - fadeStart) / (bufLen - fadeStart);
+    }
 
-      const gain = ctx.createGain();
-      gain.gain.value = vol;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
 
-      src.connect(bp);
-      bp.connect(gain);
-      gain.connect(ctx.destination);
-      src.start(ctx.currentTime + time);
-    });
+    // Bandpass filter for wooden tone
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 1200;
+    bp.Q.value = 1.5;
+
+    const gain = ctx.createGain();
+    gain.gain.value = 0.6;
+
+    src.connect(bp);
+    bp.connect(gain);
+    gain.connect(ctx.destination);
+    src.start();
+
+    // Final "thud" landing sound at 12s
+    setTimeout(() => {
+      try {
+        const thudLen = Math.floor(sampleRate * 0.15);
+        const thudBuf = ctx.createBuffer(1, thudLen, sampleRate);
+        const td = thudBuf.getChannelData(0);
+        for (let i = 0; i < thudLen; i++) {
+          const env = Math.exp(-i / (sampleRate * 0.04));
+          td[i] = (Math.random() * 2 - 1) * env * 0.5 + Math.sin(i / sampleRate * 150 * Math.PI * 2) * env * 0.3;
+        }
+        const thudSrc = ctx.createBufferSource();
+        thudSrc.buffer = thudBuf;
+        const thudGain = ctx.createGain();
+        thudGain.gain.value = 0.8;
+        thudSrc.connect(thudGain);
+        thudGain.connect(ctx.destination);
+        thudSrc.start();
+      } catch (e) {}
+    }, duration * 1000);
   } catch (e) {
     // Audio not available
   }
