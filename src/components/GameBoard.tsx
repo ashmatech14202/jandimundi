@@ -197,14 +197,13 @@ const GameBoard = () => {
                     key={`shuffle-${i}`}
                     className="flex items-center justify-center"
                     animate={{
-                      rotate: [0, -8, 8, -5, 5, 0],
-                      scale: [1, 0.9, 1.05, 0.95, 1],
+                      rotateY: [0, 360],
                     }}
                     transition={{
-                      duration: 0.3,
+                      duration: 0.5,
                       repeat: Infinity,
-                      repeatType: "mirror",
-                      delay: i * 0.03,
+                      ease: "linear",
+                      delay: i * 0.08,
                     }}
                   >
                     <SymbolComp size={100} />
