@@ -14,7 +14,6 @@ const GutiImage = ({ src, alt, size = 80 }: { src: string; alt: string; size?: n
       src={src}
       alt={alt}
       style={{ width: size * 0.85, height: size * 0.85, objectFit: "contain" }}
-      className="drop-shadow-md"
     />
   </div>
 );
