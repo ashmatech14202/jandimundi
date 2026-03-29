@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, Info } from "lucide-react";
 import {
@@ -65,6 +65,29 @@ const GameBoard = () => {
   const [results, setResults] = useState<number[]>([]);
   const [isRolling, setIsRolling] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [shuffleSymbols, setShuffleSymbols] = useState<number[]>([]);
+  const shuffleRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Shuffle symbols rapidly during rolling
+  useEffect(() => {
+    if (isRolling && results.length === 0) {
+      // Start fast shuffling
+      shuffleRef.current = setInterval(() => {
+        setShuffleSymbols(
+          Array.from({ length: 6 }, () => Math.floor(Math.random() * 6))
+        );
+      }, 100);
+    } else {
+      if (shuffleRef.current) {
+        clearInterval(shuffleRef.current);
+        shuffleRef.current = null;
+      }
+      setShuffleSymbols([]);
+    }
+    return () => {
+      if (shuffleRef.current) clearInterval(shuffleRef.current);
+    };
+  }, [isRolling, results]);
 
   const rollDice = useCallback(() => {
     if (isRolling) return;
@@ -160,6 +183,28 @@ const GameBoard = () => {
                       duration: 0.5,
                       type: "spring",
                       stiffness: 200,
+                    }}
+                  >
+                    <SymbolComp size={100} />
+                  </motion.div>
+                );
+              })
+            : isRolling && shuffleSymbols.length > 0
+            ? shuffleSymbols.map((symbolIndex, i) => {
+                const SymbolComp = SYMBOLS[symbolIndex].Component;
+                return (
+                  <motion.div
+                    key={`shuffle-${i}`}
+                    className="flex items-center justify-center"
+                    animate={{
+                      rotate: [0, -8, 8, -5, 5, 0],
+                      scale: [1, 0.9, 1.05, 0.95, 1],
+                    }}
+                    transition={{
+                      duration: 0.3,
+                      repeat: Infinity,
+                      repeatType: "mirror",
+                      delay: i * 0.03,
                     }}
                   >
                     <SymbolComp size={100} />
