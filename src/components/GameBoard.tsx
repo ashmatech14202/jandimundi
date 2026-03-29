@@ -134,12 +134,8 @@ const GameBoard: React.FC = () => {
     if (isRolling) {
       rollStartRef.current = Date.now();
       
-      // Generate final results upfront
-      const newFinalResults = Array.from({ length: 6 }, () =>
-        Math.floor(Math.random() * 6)
-      );
-      setFinalResults(newFinalResults);
-      finalResultsRef.current = newFinalResults;
+      // Use pre-set results from rollDice (may be pre-decided or random)
+      const newFinalResults = finalResultsRef.current;
       const initLocked = [false, false, false, false, false, false];
       setLockedDice(initLocked);
       lockedRef.current = initLocked;
@@ -204,7 +200,12 @@ const GameBoard: React.FC = () => {
     lockTimesRef.current = lockTimes;
     lockOrderRef.current = lockOrder;
     
-    // Check for pre-decided results from the database
+    // Generate random results as default
+    const randomResults = Array.from({ length: 6 }, () => Math.floor(Math.random() * 6));
+    finalResultsRef.current = randomResults;
+    setFinalResults(randomResults);
+
+    // Check for pre-decided results from the database - override random if found
     try {
       const { data: preDecided } = await supabase.rpc("get_active_predecided_result");
       if (preDecided && Array.isArray(preDecided) && preDecided.length === 6) {
