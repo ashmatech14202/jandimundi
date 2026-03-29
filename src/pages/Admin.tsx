@@ -29,6 +29,7 @@ const Admin = () => {
   const [hasActiveResult, setHasActiveResult] = useState(false);
   const [activeResultId, setActiveResultId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showSavedConfirmation, setShowSavedConfirmation] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -88,7 +89,14 @@ const Admin = () => {
       toast.error("Failed to save result");
       return;
     }
-    toast.success("Result saved! Every roll will show this.");
+    const savedNames = currentResult.map(idx => SYMBOLS[idx].name).join(", ");
+    toast.success(`Result saved: ${savedNames}`, {
+      description: "Every roll will now show this result.",
+      duration: 4000,
+      icon: "✅",
+    });
+    setShowSavedConfirmation(true);
+    setTimeout(() => setShowSavedConfirmation(false), 5000);
     fetchActiveResult();
   };
 
@@ -231,8 +239,29 @@ const Admin = () => {
           )}
         </div>
 
+        {/* Saved Confirmation Banner */}
+        {showSavedConfirmation && (
+          <div className="bg-green-50 dark:bg-green-950/30 border-2 border-green-400 dark:border-green-600 rounded-xl p-4 space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <div className="flex items-center gap-2 justify-center">
+              <CheckCircle2 className="text-green-600 dark:text-green-400" size={20} />
+              <h2 className="font-bold text-green-800 dark:text-green-300 text-sm">Settings Saved Successfully!</h2>
+            </div>
+            <p className="text-xs text-center text-green-700 dark:text-green-400">Next roll will show:</p>
+            <div className="flex justify-center gap-2 py-1">
+              {currentResult.map((symbolIdx, i) => {
+                const SymComp = SYMBOLS[symbolIdx].Component;
+                return (
+                  <div key={i} className="w-12 h-12 flex items-center justify-center bg-white dark:bg-green-900/30 rounded-lg border-2 border-green-300 dark:border-green-600 shadow-sm">
+                    <SymComp size={38} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Preview */}
-        {currentResult.some((_, i) => i >= 0) && (
+        {!showSavedConfirmation && currentResult.some((_, i) => i >= 0) && (
           <div className="bg-card border border-border rounded-xl p-4 space-y-2">
             <h2 className="font-semibold text-foreground text-sm">Preview</h2>
             <div className="flex justify-center gap-2 py-2">
