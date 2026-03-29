@@ -134,12 +134,8 @@ const GameBoard: React.FC = () => {
     if (isRolling) {
       rollStartRef.current = Date.now();
       
-      // Generate final results upfront
-      const newFinalResults = Array.from({ length: 6 }, () =>
-        Math.floor(Math.random() * 6)
-      );
-      setFinalResults(newFinalResults);
-      finalResultsRef.current = newFinalResults;
+      // Use pre-set results from rollDice (may be pre-decided or random)
+      const newFinalResults = finalResultsRef.current;
       const initLocked = [false, false, false, false, false, false];
       setLockedDice(initLocked);
       lockedRef.current = initLocked;
