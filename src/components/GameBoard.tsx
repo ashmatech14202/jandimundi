@@ -162,7 +162,7 @@ const GameBoard = () => {
                       stiffness: 200,
                     }}
                   >
-                    <SymbolComp size={100} />
+                    <SymbolComp size={130} />
                   </motion.div>
                 );
               })
@@ -176,7 +176,7 @@ const GameBoard = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
                   >
-                    <SymbolComp size={100} />
+                    <SymbolComp size={130} />
                   </motion.div>
                 );
               })}
