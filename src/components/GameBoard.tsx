@@ -23,41 +23,39 @@ const SYMBOLS = [
 const playRollSound = () => {
   try {
     const ctx = new AudioContext();
-    const duration = 0.8;
 
-    // Rolling noise — rapid clicks like dice tumbling on a surface
-    const bufferLen = ctx.sampleRate * duration;
-    const buffer = ctx.createBuffer(1, bufferLen, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
+    // Multiple rapid "clack" hits that slow down — like dice bouncing
+    const hits = [0, 0.05, 0.1, 0.16, 0.23, 0.31, 0.4, 0.5, 0.62];
+    
+    hits.forEach((time, i) => {
+      const vol = 0.25 * Math.pow(0.75, i); // each hit quieter
+      
+      // Clack sound — short noise burst
+      const bufLen = Math.floor(ctx.sampleRate * 0.03);
+      const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let j = 0; j < bufLen; j++) {
+        const env = Math.exp(-j / (ctx.sampleRate * 0.008));
+        d[j] = (Math.random() * 2 - 1) * env;
+      }
 
-    for (let i = 0; i < bufferLen; i++) {
-      const t = i / ctx.sampleRate;
-      // Decaying amplitude envelope — loud at start, fades out
-      const envelope = Math.pow(1 - t / duration, 1.5);
-      // Rapid clicking pattern simulating dice bouncing
-      const clickRate = 30 - 20 * (t / duration); // slows down over time
-      const click = Math.sin(2 * Math.PI * clickRate * t) > 0.3 ? 1 : 0;
-      // Mix noise bursts with clicks
-      const noise = (Math.random() * 2 - 1) * 0.5;
-      const tone = Math.sin(2 * Math.PI * 200 * t) * 0.3;
-      data[i] = envelope * click * (noise + tone) * 0.4;
-    }
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
 
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
+      // Bandpass for wooden "clack" tone
+      const bp = ctx.createBiquadFilter();
+      bp.type = "bandpass";
+      bp.frequency.value = 800 + Math.random() * 600;
+      bp.Q.value = 2;
 
-    // Add slight filter for wooden table feel
-    const filter = ctx.createBiquadFilter();
-    filter.type = "lowpass";
-    filter.frequency.value = 2000;
+      const gain = ctx.createGain();
+      gain.gain.value = vol;
 
-    const gain = ctx.createGain();
-    gain.gain.value = 0.5;
-
-    source.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-    source.start();
+      src.connect(bp);
+      bp.connect(gain);
+      gain.connect(ctx.destination);
+      src.start(ctx.currentTime + time);
+    });
   } catch (e) {
     // Audio not available
   }
