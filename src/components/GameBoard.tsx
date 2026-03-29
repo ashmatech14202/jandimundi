@@ -23,7 +23,7 @@ const SYMBOLS = [
 const playRollSound = () => {
   try {
     const ctx = new AudioContext();
-    const duration = 12;
+    const duration = 8;
 
     // Continuous rattling noise — like dice shaking in a cup
     const sampleRate = ctx.sampleRate;
@@ -39,7 +39,7 @@ const playRollSound = () => {
       clickTimer += 1 / sampleRate;
 
       // Gradually slow down clicks in the last 2 seconds
-      const slowFactor = t > 10 ? 1 + (t - 10) * 3 : 1;
+      const slowFactor = t > 6 ? 1 + (t - 6) * 3 : 1;
       const currentInterval = clickInterval * slowFactor;
 
       if (clickTimer >= currentInterval) {
@@ -53,7 +53,7 @@ const playRollSound = () => {
       }
 
       // Add subtle low rumble throughout
-      const rumbleEnv = t > 10 ? Math.max(0, 1 - (t - 10) / 2) : 1;
+      const rumbleEnv = t > 6 ? Math.max(0, 1 - (t - 6) / 2) : 1;
       d[i] += Math.sin(t * 120 * Math.PI * 2) * 0.02 * rumbleEnv;
     }
 
@@ -142,7 +142,7 @@ const GameBoard = () => {
       );
       setResults(newResults);
       setIsRolling(false);
-    }, 12000);
+    }, 8000);
   }, [isRolling]);
 
   const resetGame = () => {
