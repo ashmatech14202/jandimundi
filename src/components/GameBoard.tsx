@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, Info } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ClubSymbol,
   CrownSymbol,
