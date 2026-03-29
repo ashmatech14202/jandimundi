@@ -6,14 +6,17 @@ import flagImage from "@/assets/flag-guti.jpg";
 import diamondImage from "@/assets/diamond-guti.jpg";
 
 const GutiImage = ({ src, alt, size = 80 }: { src: string; alt: string; size?: number }) => (
-  <img
-    src={src}
-    alt={alt}
-    width={size}
-    height={size}
-    style={{ objectFit: "contain" }}
-    className="drop-shadow-md"
-  />
+  <div
+    style={{ width: size, height: size }}
+    className="flex items-center justify-center overflow-hidden"
+  >
+    <img
+      src={src}
+      alt={alt}
+      style={{ width: size * 0.85, height: size * 0.85, objectFit: "contain" }}
+      className="drop-shadow-md"
+    />
+  </div>
 );
 
 export const ClubSymbol = ({ size = 80 }: { size?: number }) => (
