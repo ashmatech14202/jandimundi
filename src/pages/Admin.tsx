@@ -14,12 +14,12 @@ import {
 } from "@/components/JhandiSymbols";
 
 const SYMBOLS = [
-  { name: "Club", Component: ClubSymbol },
   { name: "Crown", Component: CrownSymbol },
+  { name: "Diamond", Component: DiamondSymbol },
   { name: "Heart", Component: HeartSymbol },
   { name: "Spade", Component: SpadeSymbol },
   { name: "Flag", Component: FlagSymbol },
-  { name: "Diamond", Component: DiamondSymbol },
+  { name: "Club", Component: ClubSymbol },
 ];
 
 const Admin = () => {
