@@ -81,53 +81,50 @@ export const SpadeSymbol = ({ size = 80 }: { size?: number }) => (
 );
 
 // ── 3. FLAG (Jhandi) ──────────────────────────────────────────
-// Waving flag with thick black outline, red checkered grid inside, pole with arrow fork
+// Waving flag with thick black outline, red checkered grid inside, pole with fork
 export const FlagSymbol = ({ size = 80 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Flag cloth - outer black shape */}
+    {/* Flag cloth - thick outer black shape, angular waving */}
     <path
-      d="M130 15 C95 10, 55 30, 40 28 C25 55, 30 90, 45 115 C70 110, 105 125, 135 118 C155 85, 150 45, 130 15Z"
+      d="M125 18 C90 12, 55 35, 35 30 C20 55, 25 95, 40 120 C65 115, 100 130, 130 122 C150 90, 148 50, 125 18Z"
       fill={BK}
       stroke={BK}
-      strokeWidth="5"
+      strokeWidth="8"
       strokeLinejoin="round"
     />
 
-    {/* White inner border */}
+    {/* Red fill inside with white border */}
     <path
-      d="M125 23 C95 19, 60 36, 47 34 C35 56, 38 85, 50 108 C72 104, 102 117, 128 112 C145 82, 142 50, 125 23Z"
-      fill={WH}
-    />
-
-    {/* Red fill inside */}
-    <path
-      d="M120 30 C94 27, 65 41, 53 39 C43 58, 45 82, 55 102 C74 99, 100 110, 123 106 C137 80, 135 55, 120 30Z"
+      d="M118 28 C90 23, 62 42, 45 38 C33 58, 35 90, 48 112 C68 108, 98 120, 122 114 C138 86, 136 55, 118 28Z"
       fill={RD}
     />
 
-    {/* Grid lines horizontal */}
-    <line x1="52" y1="50" x2="130" y2="45" stroke={WH} strokeWidth="2.5" />
-    <line x1="48" y1="62" x2="133" y2="58" stroke={WH} strokeWidth="2.5" />
-    <line x1="46" y1="74" x2="135" y2="72" stroke={WH} strokeWidth="2.5" />
-    <line x1="48" y1="86" x2="133" y2="85" stroke={WH} strokeWidth="2.5" />
-    <line x1="52" y1="97" x2="128" y2="98" stroke={WH} strokeWidth="2.5" />
+    {/* Crosshatch grid - horizontal */}
+    <line x1="46" y1="48" x2="128" y2="42" stroke={BK} strokeWidth="3" />
+    <line x1="42" y1="58" x2="132" y2="53" stroke={BK} strokeWidth="3" />
+    <line x1="39" y1="68" x2="134" y2="64" stroke={BK} strokeWidth="3" />
+    <line x1="37" y1="78" x2="136" y2="75" stroke={BK} strokeWidth="3" />
+    <line x1="38" y1="88" x2="135" y2="86" stroke={BK} strokeWidth="3" />
+    <line x1="40" y1="98" x2="132" y2="97" stroke={BK} strokeWidth="3" />
+    <line x1="44" y1="107" x2="128" y2="108" stroke={BK} strokeWidth="3" />
 
-    {/* Grid lines vertical */}
-    <line x1="70" y1="34" x2="66" y2="104" stroke={WH} strokeWidth="2.5" />
-    <line x1="88" y1="30" x2="85" y2="108" stroke={WH} strokeWidth="2.5" />
-    <line x1="105" y1="29" x2="104" y2="110" stroke={WH} strokeWidth="2.5" />
-    <line x1="120" y1="32" x2="120" y2="108" stroke={WH} strokeWidth="2.5" />
+    {/* Crosshatch grid - vertical/diagonal */}
+    <line x1="60" y1="35" x2="56" y2="112" stroke={BK} strokeWidth="3" />
+    <line x1="75" y1="30" x2="72" y2="114" stroke={BK} strokeWidth="3" />
+    <line x1="90" y1="27" x2="88" y2="116" stroke={BK} strokeWidth="3" />
+    <line x1="105" y1="27" x2="104" y2="118" stroke={BK} strokeWidth="3" />
+    <line x1="118" y1="30" x2="118" y2="116" stroke={BK} strokeWidth="3" />
 
-    {/* Pole */}
-    <line x1="140" y1="20" x2="140" y2="178" stroke={BK} strokeWidth="6" strokeLinecap="round" />
+    {/* Pole - thick */}
+    <line x1="138" y1="22" x2="138" y2="180" stroke={BK} strokeWidth="7" strokeLinecap="round" />
 
-    {/* Pole top hook/curve */}
-    <path d="M140 18 C140 12, 134 10, 130 14" stroke={BK} strokeWidth="5" fill="none" strokeLinecap="round" />
+    {/* Pole top hook */}
+    <path d="M138 20 C138 12, 130 8, 124 14" stroke={BK} strokeWidth="6" fill="none" strokeLinecap="round" />
 
-    {/* Arrow fork at bottom */}
-    <line x1="140" y1="178" x2="125" y2="205" stroke={BK} strokeWidth="5" strokeLinecap="round" />
-    <line x1="140" y1="178" x2="155" y2="205" stroke={BK} strokeWidth="5" strokeLinecap="round" />
-    <line x1="140" y1="190" x2="140" y2="210" stroke={BK} strokeWidth="5" strokeLinecap="round" />
+    {/* Three-pronged fork at bottom */}
+    <line x1="138" y1="180" x2="120" y2="210" stroke={BK} strokeWidth="6" strokeLinecap="round" />
+    <line x1="138" y1="180" x2="156" y2="210" stroke={BK} strokeWidth="6" strokeLinecap="round" />
+    <line x1="138" y1="185" x2="138" y2="215" stroke={BK} strokeWidth="6" strokeLinecap="round" />
   </svg>
 );
 
@@ -236,44 +233,36 @@ export const HeartSymbol = ({ size = 80 }: { size?: number }) => (
 );
 
 // ── 6. DIAMOND (Burja) ────────────────────────────────────────
-// Red 4-pointed concave star with geometric sun/flower cutout pattern
+// Red 4-pointed concave star with geometric lattice/sunburst pattern
 export const DiamondSymbol = ({ size = 80 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Outer 4-pointed concave star shape */}
+    {/* Outer 4-pointed concave star shape - deeper concavity */}
     <path
-      d="M100 5 C118 42, 158 42, 195 100 C158 158, 118 158, 100 195 C82 158, 42 158, 5 100 C42 42, 82 42, 100 5Z"
+      d="M100 5 C112 35, 165 35, 195 100 C165 165, 112 165, 100 195 C88 165, 35 165, 5 100 C35 35, 88 35, 100 5Z"
       fill={RD}
     />
 
-    {/* Radiating white cutout lines from center */}
-    {/* Vertical */}
-    <line x1="100" y1="22" x2="100" y2="82" stroke={WH} strokeWidth="5" />
-    <line x1="100" y1="118" x2="100" y2="178" stroke={WH} strokeWidth="5" />
-    {/* Horizontal */}
-    <line x1="22" y1="100" x2="82" y2="100" stroke={WH} strokeWidth="5" />
-    <line x1="118" y1="100" x2="178" y2="100" stroke={WH} strokeWidth="5" />
+    {/* Radiating white lines from center to tips - creating lattice */}
+    {/* Cardinal directions */}
+    <line x1="100" y1="15" x2="100" y2="185" stroke={WH} strokeWidth="5" />
+    <line x1="15" y1="100" x2="185" y2="100" stroke={WH} strokeWidth="5" />
 
-    {/* Diagonal lines */}
-    <line x1="55" y1="40" x2="88" y2="88" stroke={WH} strokeWidth="4" />
-    <line x1="145" y1="40" x2="112" y2="88" stroke={WH} strokeWidth="4" />
-    <line x1="55" y1="160" x2="88" y2="112" stroke={WH} strokeWidth="4" />
-    <line x1="145" y1="160" x2="112" y2="112" stroke={WH} strokeWidth="4" />
+    {/* Diagonal lines to corners */}
+    <line x1="48" y1="38" x2="152" y2="162" stroke={WH} strokeWidth="4.5" />
+    <line x1="152" y1="38" x2="48" y2="162" stroke={WH} strokeWidth="4.5" />
 
-    {/* Additional radiating lines */}
-    <line x1="38" y1="62" x2="85" y2="92" stroke={WH} strokeWidth="3.5" />
-    <line x1="162" y1="62" x2="115" y2="92" stroke={WH} strokeWidth="3.5" />
-    <line x1="38" y1="138" x2="85" y2="108" stroke={WH} strokeWidth="3.5" />
-    <line x1="162" y1="138" x2="115" y2="108" stroke={WH} strokeWidth="3.5" />
+    {/* Additional radiating lines between main axes */}
+    <line x1="32" y1="62" x2="168" y2="138" stroke={WH} strokeWidth="4" />
+    <line x1="168" y1="62" x2="32" y2="138" stroke={WH} strokeWidth="4" />
+    <line x1="62" y1="32" x2="138" y2="168" stroke={WH} strokeWidth="4" />
+    <line x1="138" y1="32" x2="62" y2="168" stroke={WH} strokeWidth="4" />
+
+    {/* Inner ring of white to create lattice effect */}
+    <circle cx="100" cy="100" r="45" fill="none" stroke={WH} strokeWidth="4" />
 
     {/* Center circle */}
-    <circle cx="100" cy="100" r="18" fill={WH} />
-    <circle cx="100" cy="100" r="10" fill={RD} />
-    <circle cx="100" cy="100" r="4" fill={WH} />
-
-    {/* Small diamond cutouts between main rays */}
-    <polygon points="130,52 140,62 130,72 120,62" fill={WH} />
-    <polygon points="70,52 80,62 70,72 60,62" fill={WH} />
-    <polygon points="130,128 140,138 130,148 120,138" fill={WH} />
-    <polygon points="70,128 80,138 70,148 60,138" fill={WH} />
+    <circle cx="100" cy="100" r="14" fill={WH} />
+    <circle cx="100" cy="100" r="7" fill={RD} />
+    <circle cx="100" cy="100" r="3" fill={WH} />
   </svg>
 );
