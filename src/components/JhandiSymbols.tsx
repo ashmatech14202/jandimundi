@@ -1,215 +1,279 @@
 // ═══════════════════════════════════════════════════════════════
-// JHANDI MUNDA — UNIFIED GUTI DESIGN SYSTEM
+// JHANDI MUNDA — EXACT TRADITIONAL GUTI REPRODUCTIONS
 // ═══════════════════════════════════════════════════════════════
-//
-// DESIGN LANGUAGE:
-//   - Base: Circular token with subtle gradient + soft shadow
-//   - Inner: Clean, minimal symbol centered inside
-//   - Palette: Charcoal (#2D2D2D) for dark pieces,
-//             Crimson (#C62828) for red pieces,
-//             White (#FFFFFF) for inner details
-//   - Stroke: Consistent 2.5px across all symbols
-//   - Style: Flat with soft depth (gradient ring + inner shadow)
-//
-// 6 TOKENS: Crown, Diamond, Heart, Spade, Flag, Club
+// Flat vector, no shadows, no gradients
+// Colors: Black #1A1A1A, Red #B7352A, White #FFFFFF
+// Bold outlines, exact traditional shapes
 // ═══════════════════════════════════════════════════════════════
 
-const DARK = "#2D2D2D";
-const DARK_LIGHT = "#444444";
-const RED = "#C62828";
-const RED_LIGHT = "#E53935";
-const WHITE = "#FFFFFF";
-const STROKE = 2.5;
+const BK = "#1A1A1A";
+const RD = "#B7352A";
+const WH = "#FFFFFF";
 
-// Shared circular token base
-const TokenBase = ({
-  children,
-  color,
-  colorLight,
-  id,
-  size,
-}: {
-  children: React.ReactNode;
-  color: string;
-  colorLight: string;
-  id: string;
-  size: number;
-}) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 120 120"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <defs>
-      {/* Outer ring gradient */}
-      <radialGradient id={`ring-${id}`} cx="0.4" cy="0.35" r="0.7">
-        <stop offset="0%" stopColor={colorLight} />
-        <stop offset="100%" stopColor={color} />
-      </radialGradient>
-      {/* Inner shadow */}
-      <radialGradient id={`inner-${id}`} cx="0.5" cy="0.45" r="0.5">
-        <stop offset="0%" stopColor={WHITE} stopOpacity="0.12" />
-        <stop offset="100%" stopColor={color} stopOpacity="0" />
-      </radialGradient>
-      {/* Drop shadow */}
-      <filter id={`shadow-${id}`} x="-10%" y="-5%" width="120%" height="130%">
-        <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#000" floodOpacity="0.25" />
-      </filter>
-    </defs>
+// ── 1. CLUB (Chiria) ──────────────────────────────────────────
+// Three circles in trefoil, each with concentric rings, triangle stem
+export const ClubSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Top circle - concentric rings */}
+    <circle cx="100" cy="55" r="42" fill={BK} />
+    <circle cx="100" cy="55" r="30" fill={WH} />
+    <circle cx="100" cy="55" r="22" fill={BK} />
+    <circle cx="100" cy="55" r="12" fill={WH} />
+    <circle cx="100" cy="55" r="5" fill={BK} />
 
-    {/* Shadow layer */}
-    <circle cx="60" cy="62" r="52" fill="rgba(0,0,0,0.15)" />
+    {/* Bottom-left circle */}
+    <circle cx="58" cy="125" r="42" fill={BK} />
+    <circle cx="58" cy="125" r="30" fill={WH} />
+    <circle cx="58" cy="125" r="22" fill={BK} />
+    <circle cx="58" cy="125" r="12" fill={WH} />
+    <circle cx="58" cy="125" r="5" fill={BK} />
 
-    {/* Outer ring */}
-    <circle
-      cx="60"
-      cy="60"
-      r="52"
-      fill={`url(#ring-${id})`}
-      filter={`url(#shadow-${id})`}
-    />
+    {/* Bottom-right circle */}
+    <circle cx="142" cy="125" r="42" fill={BK} />
+    <circle cx="142" cy="125" r="30" fill={WH} />
+    <circle cx="142" cy="125" r="22" fill={BK} />
+    <circle cx="142" cy="125" r="12" fill={WH} />
+    <circle cx="142" cy="125" r="5" fill={BK} />
 
-    {/* Inner circle (lighter) */}
-    <circle cx="60" cy="60" r="42" fill={color} />
+    {/* Center connector fill */}
+    <circle cx="100" cy="95" r="20" fill={BK} />
+    <circle cx="80" cy="85" r="14" fill={BK} />
+    <circle cx="120" cy="85" r="14" fill={BK} />
 
-    {/* Subtle highlight */}
-    <circle cx="60" cy="60" r="42" fill={`url(#inner-${id})`} />
-
-    {/* Inner ring accent */}
-    <circle
-      cx="60"
-      cy="60"
-      r="42"
-      fill="none"
-      stroke={WHITE}
-      strokeWidth="1"
-      strokeOpacity="0.15"
-    />
-
-    {/* Symbol content */}
-    {children}
+    {/* Stem - pointed triangle */}
+    <polygon points="88,158 112,158 100,200" fill={BK} />
   </svg>
 );
 
-// ── 1. CROWN ──────────────────────────────────────────────────
-export const CrownSymbol = ({ size = 80 }: { size?: number }) => (
-  <TokenBase color={DARK} colorLight={DARK_LIGHT} id="crown" size={size}>
-    {/* Simple modern crown */}
-    <path
-      d="M35 72 L35 55 L45 65 L53 48 L60 60 L67 48 L75 65 L85 55 L85 72 Z"
-      fill={WHITE}
-      stroke={WHITE}
-      strokeWidth={STROKE}
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    />
-    {/* Base bar */}
-    <rect x="35" y="72" width="50" height="6" rx="2" fill={WHITE} />
-    {/* Three dots on crown */}
-    <circle cx="45" cy="54" r="2.5" fill={WHITE} />
-    <circle cx="60" cy="47" r="2.5" fill={WHITE} />
-    <circle cx="75" cy="54" r="2.5" fill={WHITE} />
-  </TokenBase>
-);
-
-// ── 2. DIAMOND ────────────────────────────────────────────────
-export const DiamondSymbol = ({ size = 80 }: { size?: number }) => (
-  <TokenBase color={RED} colorLight={RED_LIGHT} id="diamond" size={size}>
-    {/* 4-pointed star / diamond */}
-    <path
-      d="M60 30 L72 52 L92 60 L72 68 L60 90 L48 68 L28 60 L48 52 Z"
-      fill={WHITE}
-      stroke={WHITE}
-      strokeWidth={STROKE}
-      strokeLinejoin="round"
-    />
-    {/* Inner diamond */}
-    <path
-      d="M60 42 L67 55 L78 60 L67 65 L60 78 L53 65 L42 60 L53 55 Z"
-      fill={RED}
-      stroke="none"
-    />
-    {/* Center dot */}
-    <circle cx="60" cy="60" r="3" fill={WHITE} />
-  </TokenBase>
-);
-
-// ── 3. HEART ──────────────────────────────────────────────────
-export const HeartSymbol = ({ size = 80 }: { size?: number }) => (
-  <TokenBase color={RED} colorLight={RED_LIGHT} id="heart" size={size}>
-    {/* Clean heart shape */}
-    <path
-      d="M60 82 C60 82, 34 65, 34 50 C34 40, 42 34, 50 34 C55 34, 58 37, 60 40 C62 37, 65 34, 70 34 C78 34, 86 40, 86 50 C86 65, 60 82, 60 82Z"
-      fill={WHITE}
-      stroke={WHITE}
-      strokeWidth={STROKE}
-      strokeLinejoin="round"
-    />
-  </TokenBase>
-);
-
-// ── 4. SPADE ──────────────────────────────────────────────────
+// ── 2. SPADE (Hukum) ──────────────────────────────────────────
+// Pointed top with horizontal white stripes, vertical center line, two circle eyes
 export const SpadeSymbol = ({ size = 80 }: { size?: number }) => (
-  <TokenBase color={DARK} colorLight={DARK_LIGHT} id="spade" size={size}>
-    {/* Clean spade shape */}
+  <svg width={size} height={size} viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Main spade body */}
     <path
-      d="M60 32 C60 32, 34 52, 34 65 C34 75, 42 80, 50 76 C50 76, 48 82, 46 86 L60 86 L74 86 C72 82, 70 76, 70 76 C78 80, 86 75, 86 65 C86 52, 60 32, 60 32Z"
-      fill={WHITE}
-      stroke={WHITE}
-      strokeWidth={STROKE}
-      strokeLinejoin="round"
+      d="M100 5 C100 5, 15 85, 15 130 C15 165, 48 178, 72 162 L68 185 L100 185 L132 185 L128 162 C152 178, 185 165, 185 130 C185 85, 100 5, 100 5Z"
+      fill={BK}
     />
-  </TokenBase>
+
+    {/* Horizontal white stripes in upper triangle */}
+    <line x1="75" y1="42" x2="125" y2="42" stroke={WH} strokeWidth="4" />
+    <line x1="65" y1="54" x2="135" y2="54" stroke={WH} strokeWidth="4" />
+    <line x1="55" y1="66" x2="145" y2="66" stroke={WH} strokeWidth="4" />
+    <line x1="47" y1="78" x2="153" y2="78" stroke={WH} strokeWidth="4" />
+    <line x1="40" y1="90" x2="160" y2="90" stroke={WH} strokeWidth="4" />
+
+    {/* Center vertical line through stripes */}
+    <line x1="100" y1="10" x2="100" y2="98" stroke={WH} strokeWidth="2.5" />
+
+    {/* Left eye - concentric */}
+    <circle cx="62" cy="128" r="26" fill={BK} stroke={WH} strokeWidth="4" />
+    <circle cx="62" cy="128" r="14" fill={BK} stroke={WH} strokeWidth="3" />
+    <circle cx="62" cy="128" r="5" fill={WH} />
+
+    {/* Right eye - concentric */}
+    <circle cx="138" cy="128" r="26" fill={BK} stroke={WH} strokeWidth="4" />
+    <circle cx="138" cy="128" r="14" fill={BK} stroke={WH} strokeWidth="3" />
+    <circle cx="138" cy="128" r="5" fill={WH} />
+
+    {/* Small triangle between eyes at bottom */}
+    <polygon points="90,155 110,155 100,172" fill={BK} />
+  </svg>
 );
 
-// ── 5. FLAG ───────────────────────────────────────────────────
+// ── 3. FLAG (Jhandi) ──────────────────────────────────────────
+// Waving flag with thick black outline, red checkered grid inside, pole with arrow fork
 export const FlagSymbol = ({ size = 80 }: { size?: number }) => (
-  <TokenBase color={RED} colorLight={RED_LIGHT} id="flag" size={size}>
-    {/* Flag pole */}
-    <line
-      x1="42"
-      y1="35"
-      x2="42"
-      y2="85"
-      stroke={WHITE}
-      strokeWidth={STROKE + 0.5}
-      strokeLinecap="round"
-    />
-    {/* Flag body - clean pennant */}
+  <svg width={size} height={size} viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Flag cloth - outer black shape */}
     <path
-      d="M44 35 L80 45 L44 58 Z"
-      fill={WHITE}
-      stroke={WHITE}
-      strokeWidth={STROKE}
+      d="M130 15 C95 10, 55 30, 40 28 C25 55, 30 90, 45 115 C70 110, 105 125, 135 118 C155 85, 150 45, 130 15Z"
+      fill={BK}
+      stroke={BK}
+      strokeWidth="5"
       strokeLinejoin="round"
     />
-    {/* Small base */}
-    <line x1="36" y1="85" x2="48" y2="85" stroke={WHITE} strokeWidth={STROKE} strokeLinecap="round" />
-  </TokenBase>
+
+    {/* White inner border */}
+    <path
+      d="M125 23 C95 19, 60 36, 47 34 C35 56, 38 85, 50 108 C72 104, 102 117, 128 112 C145 82, 142 50, 125 23Z"
+      fill={WH}
+    />
+
+    {/* Red fill inside */}
+    <path
+      d="M120 30 C94 27, 65 41, 53 39 C43 58, 45 82, 55 102 C74 99, 100 110, 123 106 C137 80, 135 55, 120 30Z"
+      fill={RD}
+    />
+
+    {/* Grid lines horizontal */}
+    <line x1="52" y1="50" x2="130" y2="45" stroke={WH} strokeWidth="2.5" />
+    <line x1="48" y1="62" x2="133" y2="58" stroke={WH} strokeWidth="2.5" />
+    <line x1="46" y1="74" x2="135" y2="72" stroke={WH} strokeWidth="2.5" />
+    <line x1="48" y1="86" x2="133" y2="85" stroke={WH} strokeWidth="2.5" />
+    <line x1="52" y1="97" x2="128" y2="98" stroke={WH} strokeWidth="2.5" />
+
+    {/* Grid lines vertical */}
+    <line x1="70" y1="34" x2="66" y2="104" stroke={WH} strokeWidth="2.5" />
+    <line x1="88" y1="30" x2="85" y2="108" stroke={WH} strokeWidth="2.5" />
+    <line x1="105" y1="29" x2="104" y2="110" stroke={WH} strokeWidth="2.5" />
+    <line x1="120" y1="32" x2="120" y2="108" stroke={WH} strokeWidth="2.5" />
+
+    {/* Pole */}
+    <line x1="140" y1="20" x2="140" y2="178" stroke={BK} strokeWidth="6" strokeLinecap="round" />
+
+    {/* Pole top hook/curve */}
+    <path d="M140 18 C140 12, 134 10, 130 14" stroke={BK} strokeWidth="5" fill="none" strokeLinecap="round" />
+
+    {/* Arrow fork at bottom */}
+    <line x1="140" y1="178" x2="125" y2="205" stroke={BK} strokeWidth="5" strokeLinecap="round" />
+    <line x1="140" y1="178" x2="155" y2="205" stroke={BK} strokeWidth="5" strokeLinecap="round" />
+    <line x1="140" y1="190" x2="140" y2="210" stroke={BK} strokeWidth="5" strokeLinecap="round" />
+  </svg>
 );
 
-// ── 6. CLUB ───────────────────────────────────────────────────
-export const ClubSymbol = ({ size = 80 }: { size?: number }) => (
-  <TokenBase color={DARK} colorLight={DARK_LIGHT} id="club" size={size}>
-    {/* Top circle */}
-    <circle cx="60" cy="42" r="11" fill={WHITE} />
-    {/* Left circle */}
-    <circle cx="47" cy="58" r="11" fill={WHITE} />
-    {/* Right circle */}
-    <circle cx="73" cy="58" r="11" fill={WHITE} />
-    {/* Center fill */}
-    <circle cx="60" cy="52" r="6" fill={WHITE} />
-    {/* Stem */}
+// ── 4. CROWN (Mukut) ──────────────────────────────────────────
+// Black crown with red heart inside, arc of dots, cross on top, decorative base
+export const CrownSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Cross on top */}
+    <rect x="94" y="0" width="12" height="28" fill={BK} />
+    <rect x="78" y="8" width="44" height="12" fill={BK} />
+    {/* Cross end dots */}
+    <circle cx="78" cy="14" r="6" fill={BK} />
+    <circle cx="122" cy="14" r="6" fill={BK} />
+    <circle cx="100" cy="2" r="6" fill={BK} />
+
+    {/* Stem between cross and crown */}
+    <rect x="96" y="26" width="8" height="16" fill={BK} />
+
+    {/* Circle connector */}
+    <circle cx="100" cy="47" r="8" fill={BK} />
+    <circle cx="100" cy="47" r="4" fill={WH} />
+
+    {/* Arc of dots around crown (semicircle) */}
+    {Array.from({ length: 15 }, (_, i) => {
+      const angle = Math.PI + (Math.PI * i) / 14;
+      const cx = 100 + Math.cos(angle) * 75;
+      const cy = 118 + Math.sin(angle) * 62;
+      return <circle key={i} cx={cx} cy={cy} r="7.5" fill={BK} />;
+    })}
+
+    {/* Crown body */}
     <path
-      d="M56 64 L60 82 L64 64"
-      fill={WHITE}
-      stroke={WHITE}
-      strokeWidth={STROKE}
+      d="M38 140 L48 72 L75 105 L100 68 L125 105 L152 72 L162 140 Z"
+      fill={BK}
+      stroke={BK}
+      strokeWidth="3"
       strokeLinejoin="round"
     />
-    {/* Base bar */}
-    <line x1="52" y1="82" x2="68" y2="82" stroke={WHITE} strokeWidth={STROKE} strokeLinecap="round" />
-  </TokenBase>
+
+    {/* Red heart inside crown */}
+    <path
+      d="M72 112 C72 95, 100 86, 100 102 C100 86, 128 95, 128 112 C128 132, 100 148, 100 148 C100 148, 72 132, 72 112Z"
+      fill={RD}
+    />
+
+    {/* Heart inner curved stripes (left side) */}
+    <path d="M80 110 C80 100, 100 94, 100 103" fill="none" stroke={BK} strokeWidth="3" />
+    <path d="M84 118 C84 106, 100 99, 100 108" fill="none" stroke={BK} strokeWidth="3" />
+    <path d="M88 124 C88 114, 100 108, 100 114" fill="none" stroke={BK} strokeWidth="3" />
+    {/* Right side mirrored */}
+    <path d="M120 110 C120 100, 100 94, 100 103" fill="none" stroke={BK} strokeWidth="3" />
+    <path d="M116 118 C116 106, 100 99, 100 108" fill="none" stroke={BK} strokeWidth="3" />
+    <path d="M112 124 C112 114, 100 108, 100 114" fill="none" stroke={BK} strokeWidth="3" />
+
+    {/* Crown base bar */}
+    <rect x="35" y="148" width="130" height="20" rx="3" fill={BK} />
+
+    {/* Base decorative ovals */}
+    {[52, 68, 84, 100, 116, 132, 148].map((x, i) => (
+      <ellipse key={i} cx={x} cy="158" rx="4.5" ry="6" fill={WH} />
+    ))}
+
+    {/* Horizontal line above base */}
+    <rect x="35" y="143" width="130" height="5" fill={BK} />
+  </svg>
+);
+
+// ── 5. HEART (Pan) ────────────────────────────────────────────
+// Same shape as spade but in RED - pointed top, horizontal stripes, two circle eyes
+export const HeartSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Main body - same shape as spade but red */}
+    <path
+      d="M100 5 C100 5, 15 85, 15 130 C15 165, 48 178, 72 162 L68 185 L100 185 L132 185 L128 162 C152 178, 185 165, 185 130 C185 85, 100 5, 100 5Z"
+      fill={RD}
+    />
+
+    {/* Red outline */}
+    <path
+      d="M100 5 C100 5, 15 85, 15 130 C15 165, 48 178, 72 162 L68 185 L100 185 L132 185 L128 162 C152 178, 185 165, 185 130 C185 85, 100 5, 100 5Z"
+      fill="none"
+      stroke={RD}
+      strokeWidth="2"
+    />
+
+    {/* Horizontal white stripes */}
+    <line x1="75" y1="42" x2="125" y2="42" stroke={WH} strokeWidth="4" />
+    <line x1="65" y1="54" x2="135" y2="54" stroke={WH} strokeWidth="4" />
+    <line x1="55" y1="66" x2="145" y2="66" stroke={WH} strokeWidth="4" />
+    <line x1="47" y1="78" x2="153" y2="78" stroke={WH} strokeWidth="4" />
+    <line x1="40" y1="90" x2="160" y2="90" stroke={WH} strokeWidth="4" />
+
+    {/* Center vertical line */}
+    <line x1="100" y1="10" x2="100" y2="98" stroke={WH} strokeWidth="2.5" />
+
+    {/* Left eye - concentric */}
+    <circle cx="62" cy="128" r="26" fill={RD} stroke={WH} strokeWidth="4" />
+    <circle cx="62" cy="128" r="14" fill={RD} stroke={WH} strokeWidth="3" />
+    <circle cx="62" cy="128" r="5" fill={WH} />
+
+    {/* Right eye - concentric */}
+    <circle cx="138" cy="128" r="26" fill={RD} stroke={WH} strokeWidth="4" />
+    <circle cx="138" cy="128" r="14" fill={RD} stroke={WH} strokeWidth="3" />
+    <circle cx="138" cy="128" r="5" fill={WH} />
+  </svg>
+);
+
+// ── 6. DIAMOND (Burja) ────────────────────────────────────────
+// Red 4-pointed concave star with geometric sun/flower cutout pattern
+export const DiamondSymbol = ({ size = 80 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Outer 4-pointed concave star shape */}
+    <path
+      d="M100 5 C118 42, 158 42, 195 100 C158 158, 118 158, 100 195 C82 158, 42 158, 5 100 C42 42, 82 42, 100 5Z"
+      fill={RD}
+    />
+
+    {/* Radiating white cutout lines from center */}
+    {/* Vertical */}
+    <line x1="100" y1="22" x2="100" y2="82" stroke={WH} strokeWidth="5" />
+    <line x1="100" y1="118" x2="100" y2="178" stroke={WH} strokeWidth="5" />
+    {/* Horizontal */}
+    <line x1="22" y1="100" x2="82" y2="100" stroke={WH} strokeWidth="5" />
+    <line x1="118" y1="100" x2="178" y2="100" stroke={WH} strokeWidth="5" />
+
+    {/* Diagonal lines */}
+    <line x1="55" y1="40" x2="88" y2="88" stroke={WH} strokeWidth="4" />
+    <line x1="145" y1="40" x2="112" y2="88" stroke={WH} strokeWidth="4" />
+    <line x1="55" y1="160" x2="88" y2="112" stroke={WH} strokeWidth="4" />
+    <line x1="145" y1="160" x2="112" y2="112" stroke={WH} strokeWidth="4" />
+
+    {/* Additional radiating lines */}
+    <line x1="38" y1="62" x2="85" y2="92" stroke={WH} strokeWidth="3.5" />
+    <line x1="162" y1="62" x2="115" y2="92" stroke={WH} strokeWidth="3.5" />
+    <line x1="38" y1="138" x2="85" y2="108" stroke={WH} strokeWidth="3.5" />
+    <line x1="162" y1="138" x2="115" y2="108" stroke={WH} strokeWidth="3.5" />
+
+    {/* Center circle */}
+    <circle cx="100" cy="100" r="18" fill={WH} />
+    <circle cx="100" cy="100" r="10" fill={RD} />
+    <circle cx="100" cy="100" r="4" fill={WH} />
+
+    {/* Small diamond cutouts between main rays */}
+    <polygon points="130,52 140,62 130,72 120,62" fill={WH} />
+    <polygon points="70,52 80,62 70,72 60,62" fill={WH} />
+    <polygon points="130,128 140,138 130,148 120,138" fill={WH} />
+    <polygon points="70,128 80,138 70,148 60,138" fill={WH} />
+  </svg>
 );
