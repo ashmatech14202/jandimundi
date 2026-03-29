@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, Info } from "lucide-react";
+import { Volume2, Info, Download } from "lucide-react";
 import {
   ClubSymbol,
   CrownSymbol,
@@ -51,19 +51,29 @@ const GameBoard = () => {
     counts[r] = (counts[r] || 0) + 1;
   });
 
+  const getCountLabel = (count: number) => {
+    if (count === 1) return "Single";
+    if (count === 2) return "Double";
+    if (count === 3) return "Triple";
+    if (count === 4) return "Four";
+    if (count === 5) return "Five";
+    if (count === 6) return "Six!";
+    return "";
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header - Green bar */}
+      {/* Header */}
       <div className="w-full bg-primary py-3 px-4 flex items-center justify-between shadow-md">
         <h1 className="text-xl font-bold text-primary-foreground tracking-wide">
           Jhandi Munda
         </h1>
         <div className="flex items-center gap-3">
-          <button className="text-primary-foreground opacity-80 hover:opacity-100">
+          <button className="text-primary-foreground opacity-80 hover:opacity-100 transition-opacity">
             <Volume2 size={22} />
           </button>
           <button
-            className="text-primary-foreground opacity-80 hover:opacity-100"
+            className="text-primary-foreground opacity-80 hover:opacity-100 transition-opacity"
             onClick={() => setShowInfo(!showInfo)}
           >
             <Info size={22} />
@@ -78,89 +88,99 @@ const GameBoard = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="mx-4 mt-2 p-3 bg-card rounded-lg border border-border text-sm text-foreground shadow-lg"
+            className="mx-4 mt-2 p-4 bg-card rounded-xl border border-border text-sm text-foreground shadow-lg"
           >
             <p className="font-bold mb-1">How to play:</p>
-            <p>Tap "Roll" to throw 6 dice from the mug. Each die shows one of 6 symbols. See how many singles, doubles, triples, or more you get!</p>
+            <p className="text-muted-foreground">
+              Tap "Roll" to throw 6 dice. Each die shows one of 6 symbols randomly. 
+              See how many singles, doubles, triples, or more you get!
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 gap-4">
-        {/* 6 Symbol grid - showing results or default */}
-        <div className="grid grid-cols-3 gap-4 w-full max-w-xs">
+      <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 gap-5">
+        {/* 6 Symbol grid */}
+        <div className="grid grid-cols-3 gap-5 w-full max-w-xs">
           {results.length > 0
             ? results.map((symbolIndex, i) => {
                 const SymbolComp = SYMBOLS[symbolIndex].Component;
                 return (
                   <motion.div
-                    key={i}
-                    className="flex items-center justify-center aspect-square"
-                    initial={{ opacity: 0, scale: 0.3, rotate: -180 }}
+                    key={`result-${i}`}
+                    className="flex items-center justify-center"
+                    initial={{ opacity: 0, scale: 0.2, rotate: -180 }}
                     animate={{ opacity: 1, scale: 1, rotate: 0 }}
                     transition={{
                       delay: i * 0.08,
                       duration: 0.5,
-                      ease: "easeOut",
+                      type: "spring",
+                      stiffness: 200,
                     }}
                   >
-                    <SymbolComp size={90} />
+                    <SymbolComp size={95} />
                   </motion.div>
                 );
               })
             : SYMBOLS.map((symbol, i) => {
                 const SymbolComp = symbol.Component;
                 return (
-                  <div
-                    key={i}
-                    className="flex items-center justify-center aspect-square"
+                  <motion.div
+                    key={`default-${i}`}
+                    className="flex items-center justify-center"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
                   >
-                    <SymbolComp size={90} />
-                  </div>
+                    <SymbolComp size={95} />
+                  </motion.div>
                 );
               })}
         </div>
 
-        {/* Result summary */}
-        {results.length > 0 && !isRolling && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-wrap gap-2 justify-center"
-          >
-            {Object.entries(counts).map(([idx, count]) => {
-              const SymbolComp = SYMBOLS[Number(idx)].Component;
-              return (
-                <div
-                  key={idx}
-                  className="flex items-center gap-1 bg-card border border-border rounded-full px-3 py-1"
-                >
-                  <SymbolComp size={20} />
-                  <span className="text-foreground font-bold text-sm">
-                    ×{count}
-                  </span>
-                </div>
-              );
-            })}
-          </motion.div>
-        )}
+        {/* Result badges */}
+        <AnimatePresence>
+          {results.length > 0 && !isRolling && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-wrap gap-2 justify-center"
+            >
+              {Object.entries(counts).map(([idx, count]) => {
+                const SymbolComp = SYMBOLS[Number(idx)].Component;
+                return (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-1.5 bg-card border border-border rounded-full px-3 py-1.5 shadow-sm"
+                  >
+                    <SymbolComp size={22} />
+                    <span className="text-foreground font-bold text-xs">
+                      {getCountLabel(count)}
+                    </span>
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Buttons */}
-        <div className="flex flex-col gap-2 w-full max-w-[200px] mt-2">
+        <div className="flex gap-3 w-full max-w-xs mt-1">
           <motion.button
             onClick={rollDice}
             disabled={isRolling}
-            className="flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-secondary text-secondary-foreground font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full bg-secondary text-secondary-foreground font-bold text-base disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
-            <span className="text-lg">🎲</span> Roll
+            🎲 Roll
           </motion.button>
           <motion.button
             onClick={resetGame}
-            disabled={isRolling}
-            className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-secondary/80 text-secondary-foreground font-bold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+            disabled={isRolling || results.length === 0}
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full bg-muted text-foreground font-bold text-base disabled:opacity-40 disabled:cursor-not-allowed shadow-md border border-border"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
           >
