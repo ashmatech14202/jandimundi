@@ -206,7 +206,7 @@ const GameBoard: React.FC = () => {
     
     // Check for pre-decided results from the database
     try {
-      const { data: preDecided } = await supabase.rpc("get_next_predecided_result");
+      const { data: preDecided } = await supabase.rpc("get_active_predecided_result");
       if (preDecided && Array.isArray(preDecided) && preDecided.length === 6) {
         finalResultsRef.current = preDecided;
         setFinalResults(preDecided);
