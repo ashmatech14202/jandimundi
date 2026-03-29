@@ -1,19 +1,21 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import symbolClub from "@/assets/symbol-club.png";
-import symbolFlag from "@/assets/symbol-flag.png";
-import symbolDiamond from "@/assets/symbol-diamond.png";
-import symbolHeart from "@/assets/symbol-heart.png";
-import symbolSpade from "@/assets/symbol-spade.png";
-import symbolFlag2 from "@/assets/symbol-flag2.png";
+import {
+  ClubSymbol,
+  CrownSymbol,
+  SpadeSymbol,
+  DiamondSymbol,
+  FlagSymbol,
+  HeartSymbol,
+} from "./JhandiSymbols";
 
 const SYMBOLS = [
-  { name: "Club", image: symbolClub },
-  { name: "Flag", image: symbolFlag },
-  { name: "Diamond", image: symbolDiamond },
-  { name: "Heart", image: symbolHeart },
-  { name: "Spade", image: symbolSpade },
-  { name: "Jhandi", image: symbolFlag2 },
+  { name: "Club", Component: ClubSymbol },
+  { name: "Crown", Component: CrownSymbol },
+  { name: "Spade", Component: SpadeSymbol },
+  { name: "Diamond", Component: DiamondSymbol },
+  { name: "Flag", Component: FlagSymbol },
+  { name: "Heart", Component: HeartSymbol },
 ];
 
 const GameBoard = () => {
@@ -45,7 +47,7 @@ const GameBoard = () => {
     setMugTilted(false);
   };
 
-  // Count occurrences of each symbol
+  // Count occurrences
   const counts: Record<number, number> = {};
   results.forEach((r) => {
     counts[r] = (counts[r] || 0) + 1;
@@ -57,133 +59,124 @@ const GameBoard = () => {
     if (count === 3) return "Triple";
     if (count === 4) return "Four";
     if (count === 5) return "Five";
-    if (count === 6) return "Six";
+    if (count === 6) return "Six!";
     return "";
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center px-4 py-6">
+    <div className="min-h-screen bg-background flex flex-col items-center">
       {/* Header */}
-      <div className="w-full bg-secondary rounded-b-2xl py-4 px-6 mb-6 text-center -mt-6">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-secondary-foreground tracking-tight">
+      <div className="w-full bg-secondary py-4 px-6 text-center shadow-md">
+        <h1 className="text-2xl font-extrabold text-secondary-foreground tracking-tight">
           Jhandi Munda
         </h1>
       </div>
 
-      {/* 6 Symbol display - grid */}
-      <div className="grid grid-cols-3 gap-4 mb-8 w-full max-w-xs">
-        {SYMBOLS.map((symbol, i) => {
-          const count = counts[i] || 0;
-          const isActive = results.length > 0 && count > 0;
-          return (
-            <motion.div
-              key={symbol.name}
-              className={`relative flex flex-col items-center justify-center p-3 rounded-xl border-2 transition-all duration-300 ${
-                isActive
-                  ? "border-gold bg-muted shadow-[0_0_20px_hsl(var(--gold)/0.3)]"
-                  : "border-border bg-card"
-              }`}
-              animate={isActive ? { scale: [1, 1.08, 1] } : {}}
-              transition={{ duration: 0.4 }}
-            >
-              <img
-                src={symbol.image}
-                alt={symbol.name}
-                width={80}
-                height={80}
-                className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
-              />
-              <span className="text-xs text-muted-foreground mt-1 font-medium">
-                {symbol.name}
-              </span>
-              {isActive && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs font-extrabold px-2 py-0.5 rounded-full"
-                >
-                  ×{count}
-                </motion.div>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
+      <div className="flex flex-col items-center px-4 py-6 gap-5 w-full max-w-sm">
+        {/* 6 Symbol grid */}
+        <div className="grid grid-cols-3 gap-3 w-full">
+          {SYMBOLS.map((symbol, i) => {
+            const count = counts[i] || 0;
+            const isActive = results.length > 0 && count > 0;
+            const SymbolComp = symbol.Component;
+            return (
+              <motion.div
+                key={symbol.name}
+                className={`relative flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all duration-300 aspect-square ${
+                  isActive
+                    ? "border-primary bg-muted scale-105"
+                    : "border-border bg-card"
+                }`}
+                animate={isActive ? { scale: [1, 1.08, 1.05] } : { scale: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                <SymbolComp size={70} />
+                {isActive && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs font-extrabold w-7 h-7 rounded-full flex items-center justify-center border-2 border-background"
+                  >
+                    ×{count}
+                  </motion.div>
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
 
-      {/* Mug Animation */}
-      <motion.div
-        className="mb-4 text-6xl"
-        animate={
-          mugTilted
-            ? { rotate: [0, -30, -45, -30, 0], y: [0, -10, -5, 0] }
-            : {}
-        }
-        transition={{ duration: 0.8, ease: "easeInOut" }}
-      >
-        🏺
-      </motion.div>
-
-      {/* Rolled guti results */}
-      <div className="min-h-[100px] flex items-center justify-center gap-2 flex-wrap mb-4 max-w-xs">
-        <AnimatePresence>
-          {results.map((symbolIndex, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: -80, rotate: 360 }}
-              animate={{ opacity: 1, y: 0, rotate: 0 }}
-              transition={{ delay: i * 0.1, duration: 0.5, ease: "easeOut" }}
-              className="w-12 h-12 rounded-lg bg-card border border-border flex items-center justify-center shadow-md"
-            >
-              <img
-                src={SYMBOLS[symbolIndex].image}
-                alt={SYMBOLS[symbolIndex].name}
-                width={40}
-                height={40}
-                className="w-8 h-8 object-contain"
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-
-      {/* Result summary */}
-      {results.length > 0 && !isRolling && (
+        {/* Mug */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-6 space-y-1"
+          className="text-6xl"
+          animate={
+            mugTilted
+              ? { rotate: [0, -30, -45, -30, 0], y: [0, -10, -5, 0] }
+              : {}
+          }
+          transition={{ duration: 0.8, ease: "easeInOut" }}
         >
-          {Object.entries(counts).map(([idx, count]) => (
-            <p key={idx} className="text-foreground text-sm font-medium">
-              {SYMBOLS[Number(idx)].name}:{" "}
-              <span className="text-primary font-bold">
-                {getCountLabel(count)}
-              </span>
-            </p>
-          ))}
+          🏺
         </motion.div>
-      )}
 
-      {/* Buttons */}
-      <div className="flex gap-4">
-        <motion.button
-          onClick={rollDice}
-          disabled={isRolling}
-          className="px-8 py-3 rounded-full bg-secondary text-secondary-foreground font-bold text-lg border-2 border-gold disabled:opacity-50 disabled:cursor-not-allowed"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          🎲 Roll
-        </motion.button>
-        <motion.button
-          onClick={resetGame}
-          disabled={isRolling}
-          className="px-8 py-3 rounded-full bg-secondary text-secondary-foreground font-bold text-lg border-2 border-border disabled:opacity-50 disabled:cursor-not-allowed"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          ↻ Reset
-        </motion.button>
+        {/* Rolled results */}
+        <div className="min-h-[80px] flex items-center justify-center gap-2 flex-wrap">
+          <AnimatePresence>
+            {results.map((symbolIndex, i) => {
+              const SymbolComp = SYMBOLS[symbolIndex].Component;
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: -80, rotate: 360 }}
+                  animate={{ opacity: 1, y: 0, rotate: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.5, ease: "easeOut" }}
+                  className="w-12 h-12 rounded-lg bg-card border border-border flex items-center justify-center shadow-md"
+                >
+                  <SymbolComp size={32} />
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </div>
+
+        {/* Result summary */}
+        {results.length > 0 && !isRolling && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center space-y-1"
+          >
+            {Object.entries(counts).map(([idx, count]) => (
+              <p key={idx} className="text-foreground text-sm font-medium">
+                {SYMBOLS[Number(idx)].name}:{" "}
+                <span className="text-secondary font-bold">
+                  {getCountLabel(count)}
+                </span>
+              </p>
+            ))}
+          </motion.div>
+        )}
+
+        {/* Buttons */}
+        <div className="flex gap-4">
+          <motion.button
+            onClick={rollDice}
+            disabled={isRolling}
+            className="px-8 py-3 rounded-full bg-secondary text-secondary-foreground font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            🎲 Roll
+          </motion.button>
+          <motion.button
+            onClick={resetGame}
+            disabled={isRolling}
+            className="px-8 py-3 rounded-full bg-secondary text-secondary-foreground font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            ↻ Reset
+          </motion.button>
+        </div>
       </div>
     </div>
   );
