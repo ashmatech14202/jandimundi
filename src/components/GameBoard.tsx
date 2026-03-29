@@ -189,6 +189,28 @@ const GameBoard = () => {
                   </motion.div>
                 );
               })
+            : isRolling && shuffleSymbols.length > 0
+            ? shuffleSymbols.map((symbolIndex, i) => {
+                const SymbolComp = SYMBOLS[symbolIndex].Component;
+                return (
+                  <motion.div
+                    key={`shuffle-${i}`}
+                    className="flex items-center justify-center"
+                    animate={{
+                      rotate: [0, -8, 8, -5, 5, 0],
+                      scale: [1, 0.9, 1.05, 0.95, 1],
+                    }}
+                    transition={{
+                      duration: 0.3,
+                      repeat: Infinity,
+                      repeatType: "mirror",
+                      delay: i * 0.03,
+                    }}
+                  >
+                    <SymbolComp size={100} />
+                  </motion.div>
+                );
+              })
             : SYMBOLS.map((symbol, i) => {
                 const SymbolComp = symbol.Component;
                 return (
