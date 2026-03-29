@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { LogOut, Save } from "lucide-react";
+import { LogOut, Save, Trash2, Shuffle, CheckCircle2, AlertCircle } from "lucide-react";
 import {
   ClubSymbol,
   CrownSymbol,
@@ -28,6 +28,7 @@ const Admin = () => {
   const [currentResult, setCurrentResult] = useState<number[]>([0, 0, 0, 0, 0, 0]);
   const [hasActiveResult, setHasActiveResult] = useState(false);
   const [activeResultId, setActiveResultId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,32 +72,36 @@ const Admin = () => {
   };
 
   const handleSave = async () => {
+    setSaving(true);
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+    if (!session) { setSaving(false); return; }
 
-    // Delete all existing results first
     await supabase.from("pre_decided_results").delete().neq("id", "00000000-0000-0000-0000-000000000000");
 
-    // Insert the new active result
     const { error } = await supabase.from("pre_decided_results").insert({
       results: currentResult,
       created_by: session.user.id,
     });
 
+    setSaving(false);
     if (error) {
       toast.error("Failed to save result");
       return;
     }
-    toast.success("Pre-decided result saved! Every roll will now show this.");
+    toast.success("Result saved! Every roll will show this.");
     fetchActiveResult();
   };
 
   const handleClear = async () => {
     await supabase.from("pre_decided_results").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    toast.success("Pre-decided result cleared. Rolls will be random now.");
+    toast.success("Cleared! Rolls will be random now.");
     setHasActiveResult(false);
     setActiveResultId(null);
     setCurrentResult([0, 0, 0, 0, 0, 0]);
+  };
+
+  const handleSetAll = (symbolIndex: number) => {
+    setCurrentResult([symbolIndex, symbolIndex, symbolIndex, symbolIndex, symbolIndex, symbolIndex]);
   };
 
   const handleLogout = async () => {
@@ -115,7 +120,10 @@ const Admin = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <div className="animate-pulse flex flex-col items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-primary/30" />
+          <p className="text-muted-foreground text-sm">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -124,64 +132,121 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="w-full bg-primary py-3 px-4 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-primary-foreground">Admin Panel</h1>
-        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-primary-foreground hover:text-primary-foreground/80">
-          <LogOut size={18} className="mr-1" /> Logout
+      {/* Header */}
+      <div className="w-full bg-primary py-3 px-4 flex items-center justify-between shadow-md">
+        <h1 className="text-lg font-bold text-primary-foreground tracking-tight">🎲 Admin Panel</h1>
+        <Button variant="ghost" size="sm" onClick={handleLogout} className="text-primary-foreground hover:bg-primary-foreground/10">
+          <LogOut size={16} className="mr-1" /> Logout
         </Button>
       </div>
 
-      <div className="max-w-lg mx-auto p-4 space-y-6">
-        {/* Status */}
-        <div className={`p-3 rounded-lg text-center text-sm font-medium ${hasActiveResult ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" : "bg-muted text-muted-foreground"}`}>
-          {hasActiveResult ? "✅ Pre-decided result is ACTIVE — every roll will show this" : "No pre-decided result set — rolls are random"}
+      <div className="max-w-md mx-auto p-4 space-y-5">
+        {/* Status Banner */}
+        <div className={`flex items-center gap-3 p-4 rounded-xl border transition-colors ${
+          hasActiveResult
+            ? "bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
+            : "bg-muted border-border"
+        }`}>
+          {hasActiveResult ? (
+            <CheckCircle2 className="text-green-600 dark:text-green-400 shrink-0" size={22} />
+          ) : (
+            <AlertCircle className="text-muted-foreground shrink-0" size={22} />
+          )}
+          <div>
+            <p className={`text-sm font-semibold ${hasActiveResult ? "text-green-800 dark:text-green-300" : "text-foreground"}`}>
+              {hasActiveResult ? "Pre-decided result is ACTIVE" : "No result set"}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {hasActiveResult ? "Every roll will show the result below" : "All rolls are currently random"}
+            </p>
+          </div>
         </div>
 
-        {/* Set pre-decided result */}
-        <div className="bg-card border border-border rounded-xl p-4 space-y-4">
-          <h2 className="font-bold text-foreground text-base">Set Pre-Decided Result</h2>
-          <p className="text-xs text-muted-foreground">Select what each die should show on every roll:</p>
-          
-          <div className="grid grid-cols-3 gap-3">
+        {/* Quick Set All */}
+        <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+          <h2 className="font-semibold text-foreground text-sm">Quick Set (All 6 Dice)</h2>
+          <div className="flex gap-2 justify-between">
+            {SYMBOLS.map((sym, idx) => {
+              const isSelected = currentResult.every(v => v === idx);
+              return (
+                <button
+                  key={sym.name}
+                  onClick={() => handleSetAll(idx)}
+                  className={`flex flex-col items-center gap-1 p-2 rounded-lg border transition-all ${
+                    isSelected
+                      ? "border-primary bg-primary/10 shadow-sm"
+                      : "border-transparent hover:bg-muted"
+                  }`}
+                  title={`Set all to ${sym.name}`}
+                >
+                  <sym.Component size={32} />
+                  <span className="text-[9px] text-muted-foreground font-medium">{sym.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Individual Die Selection */}
+        <div className="bg-card border border-border rounded-xl p-4 space-y-3">
+          <h2 className="font-semibold text-foreground text-sm">Set Each Die Individually</h2>
+          <div className="grid grid-cols-6 gap-2">
             {currentResult.map((symbolIdx, dieIndex) => (
               <div key={dieIndex} className="flex flex-col items-center gap-1">
-                <span className="text-xs text-muted-foreground font-medium">Die {dieIndex + 1}</span>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => handleSymbolChange(dieIndex, (symbolIdx - 1 + 6) % 6)}
-                    className="text-muted-foreground hover:text-foreground text-lg px-1"
-                  >
-                    ‹
-                  </button>
-                  <div className="w-12 h-12 flex items-center justify-center">
-                    {(() => {
-                      const SymComp = SYMBOLS[symbolIdx].Component;
-                      return <SymComp size={40} />;
-                    })()}
-                  </div>
-                  <button
-                    onClick={() => handleSymbolChange(dieIndex, (symbolIdx + 1) % 6)}
-                    className="text-muted-foreground hover:text-foreground text-lg px-1"
-                  >
-                    ›
-                  </button>
+                <span className="text-[10px] text-muted-foreground font-bold">#{dieIndex + 1}</span>
+                <button
+                  onClick={() => handleSymbolChange(dieIndex, (symbolIdx - 1 + 6) % 6)}
+                  className="text-muted-foreground hover:text-foreground text-base leading-none p-1 rounded hover:bg-muted transition-colors"
+                >
+                  ▲
+                </button>
+                <div className="w-11 h-11 flex items-center justify-center bg-muted/50 rounded-lg border border-border">
+                  {(() => {
+                    const SymComp = SYMBOLS[symbolIdx].Component;
+                    return <SymComp size={34} />;
+                  })()}
                 </div>
-                <span className="text-[10px] text-muted-foreground">{SYMBOLS[symbolIdx].name}</span>
+                <button
+                  onClick={() => handleSymbolChange(dieIndex, (symbolIdx + 1) % 6)}
+                  className="text-muted-foreground hover:text-foreground text-base leading-none p-1 rounded hover:bg-muted transition-colors"
+                >
+                  ▼
+                </button>
+                <span className="text-[9px] text-muted-foreground">{SYMBOLS[symbolIdx].name}</span>
               </div>
             ))}
           </div>
-
-          <div className="flex gap-3">
-            <Button onClick={handleSave} className="flex-1">
-              <Save size={16} className="mr-1" /> Save Result
-            </Button>
-            {hasActiveResult && (
-              <Button variant="outline" onClick={handleClear} className="flex-1">
-                Clear (Random)
-              </Button>
-            )}
-          </div>
         </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          <Button onClick={handleSave} className="flex-1 h-11" disabled={saving}>
+            <Save size={16} className="mr-1.5" />
+            {saving ? "Saving..." : "Save Result"}
+          </Button>
+          {hasActiveResult && (
+            <Button variant="outline" onClick={handleClear} className="h-11 text-destructive border-destructive/30 hover:bg-destructive/10">
+              <Trash2 size={16} className="mr-1.5" /> Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Preview */}
+        {currentResult.some((_, i) => i >= 0) && (
+          <div className="bg-card border border-border rounded-xl p-4 space-y-2">
+            <h2 className="font-semibold text-foreground text-sm">Preview</h2>
+            <div className="flex justify-center gap-2 py-2">
+              {currentResult.map((symbolIdx, i) => {
+                const SymComp = SYMBOLS[symbolIdx].Component;
+                return (
+                  <div key={i} className="w-12 h-12 flex items-center justify-center bg-muted rounded-lg border border-border">
+                    <SymComp size={38} />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
