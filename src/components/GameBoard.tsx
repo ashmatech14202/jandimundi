@@ -143,9 +143,9 @@ const GameBoard = () => {
       setLockedDice(initLocked);
       lockedRef.current = initLocked;
 
-      // Staggered lock-in: each die locks at a random time in the last 3 seconds
-      const lockTimes = [5000, 5400, 5800, 6200, 6600, 7200];
-      const lockOrder = [0, 1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
+      // Use pre-computed lock times from rollDice
+      const lockTimes = lockTimesRef.current.length > 0 ? lockTimesRef.current : [5000, 5400, 5800, 6200, 6600, 7200];
+      const lockOrder = lockOrderRef.current.length > 0 ? lockOrderRef.current : [0, 1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
       
       lockOrder.forEach((dieIndex, i) => {
         setTimeout(() => {
